@@ -43,3 +43,4 @@ Use this severity scale for each restriction:
 
 - Cuisine and price filters are not an immediate need and may be added later.
 - Saving dietary profiles for reuse may be added later; searches can be temporary in the first version.
+- People can rate a restaurant based on how it took care of their allergy needs.
