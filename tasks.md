@@ -6,78 +6,57 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ## Current focus
 
-- **Mary - Backend:** [ ] Choose the backend stack and agree on the first API/data contract with Eliza.
+- **Mary - Backend/data:** [ ] Agree with Eliza on the static catalog format and data fields needed for matching.
 - **Eliza - Frontend:** Add current focus here.
 
-## Mary - Backend
+## Mary - Backend/data
 
-### 1. Decide the backend foundation
+### 1. Define the static catalog contract
 
-- [ ] Choose backend language/framework and project structure.
-- [ ] Choose database and initial hosting/deployment target.
-- [ ] Choose a background-job/queue approach for weekly source checks and menu processing.
-- [ ] Choose an AI provider/model for menu text and image extraction; confirm structured-output and image support.
-- [ ] Decide maintainer authentication and how temporary, private search sessions are identified.
-- [ ] Agree with Eliza on initial API contracts, error/loading states, and what data the frontend needs for a menu preview.
+- [ ] Agree with Eliza on the catalog format, file location, restaurant/item fields, and how the browser imports the data.
+- [ ] Define stable IDs for restaurants, sources, and menu items so updates do not create accidental duplicates.
+- [ ] Define provenance fields: source type and URL, supporting evidence, last-checked date, confidence, and whether a fact is restaurant-stated or maintainer-interpreted.
+- [ ] Represent `unknown` separately from an explicit statement that an ingredient/allergen is absent.
+- [ ] Document which values are source data and which are computed by matching logic.
 
-### 2. Get a runnable backend skeleton
+### 2. Build a repeatable Utah County source and curation process
 
-- [ ] Scaffold the backend app with environment-based configuration and secret handling.
-- [ ] Add a health/readiness endpoint, structured logging, and centralized error handling.
-- [ ] Set up local development, database migrations, and a repeatable seed-data workflow.
-- [ ] Add CI checks and a first deployable development environment.
-- [ ] Write a short setup guide so both partners can run the backend locally.
+- [ ] Create an inventory of Utah County restaurants and public menu/allergen sources, preferring official restaurant sources.
+- [ ] Record source URLs and check dates; identify third-party sources clearly when official details are unavailable.
+- [ ] Use AI to help structure candidate menu facts from source material, then verify each fact and evidence by hand before committing it.
+- [ ] Keep uncertain, conflicting, stale, or unsupported facts explicitly unknown or qualified; never infer that a dish is allergen-free from missing details.
+- [ ] Define a manual/as-needed source refresh process and update the catalog through reviewed repository changes.
 
-### 3. Define and persist the menu data
+### 3. Implement deterministic recommendation matching
 
-- [ ] Design the first data model for restaurants, sources, source checks, menu items, extracted facts, evidence, submissions, review decisions, and user reports.
-- [ ] Represent source type, evidence, confidence, extraction version, and last-checked time for each relevant fact.
-- [ ] Represent `unknown` separately from an explicit claim that an ingredient/allergen is absent.
-- [ ] Add data access rules so private submissions cannot appear in the shared catalog before approval.
-- [ ] Define temporary preview and image-retention behavior; delete uploaded images after processing.
+- [ ] Build a browser-compatible matching module that consumes the static catalog and a group's dietary restrictions.
+- [ ] Apply all four restriction severity levels from `project_specs.md`.
+- [ ] Distinguish suitable-as-listed items, items that may work with an explicit modification, and uncertain items.
+- [ ] Rank restaurants by whether every group member has at least one suitable item; allow different members to match different dishes.
+- [ ] Keep uncertain options visible with warnings and lower ranking; show a strong warning for room-level restrictions without automatically hiding the restaurant.
+- [ ] Never describe a restaurant or dish as guaranteed allergen-free; include restaurant-confirmation guidance for uncertain ingredients and preparation.
 
-### 4. Build menu-source ingestion and extraction
+### 4. Validate, test, and coordinate
 
-- [ ] Implement maintainer operations to add/update curated restaurant source URLs.
-- [ ] Build a safe URL fetcher for public sources with redirect, timeout, response-size, and network-access limits.
-- [ ] Extract readable menu content from supported web pages and keep the source URL and retrieval time.
-- [ ] Add image upload validation and menu text extraction for supported image types.
-- [ ] Define the AI extraction contract for menu items, ingredient/allergen statements, possible modifications, supporting evidence, confidence, and extraction version.
-- [ ] Validate AI output and reject or flag facts without supporting evidence; never convert missing information into an allergen-free claim.
-- [ ] Add deduplication and handling for changed menus, stale facts, and conflicting sources.
-- [ ] Add a weekly job for curated sources and a maintainer-triggered refresh.
-- [ ] Track processing states: queued, processing, completed, needs review, and failed.
+- [ ] Add catalog validation for required provenance, valid references, stable/unique IDs, and malformed data.
+- [ ] Build representative Utah County menu fixtures with known, unknown, modified, conflicting, and stale facts.
+- [ ] Test group coverage, each severity level, modifications, uncertain ranking, room-level warnings, and catalog load/validation errors.
+- [ ] Coordinate with Eliza on the exact matching input/output and fields needed to show source links, check dates, confidence, and warnings.
+- [ ] Ensure menu content is rendered safely as data, not trusted executable markup.
 
-### 5. Add private submissions, review, and reports
+### 5. Publish and maintain the static data
 
-- [ ] Accept an organizer's URL or menu image for a temporary private preview.
-- [ ] Return submission status and preview results without exposing them to other users or the shared catalog.
-- [ ] Delete the original uploaded image after processing while retaining extracted evidence for the preview/review flow.
-- [ ] Build maintainer review actions to approve or reject user-submitted facts before shared publication.
-- [ ] Add user reports for incorrect or concerning menu information and route them to an internal follow-up queue.
-- [ ] Ensure reports do not automatically edit, hide, or reclassify menu facts.
-
-### 6. Expose menu facts and prepare for recommendations
-
-- [ ] Create a read interface for the recommendation service with menu facts, evidence, source, freshness, confidence, and uncertainty.
-- [ ] Preserve whether an item is listed as-is, may work with a stated modification, or is uncertain.
-- [ ] Coordinate with Eliza on the response data needed to show source links, last-checked dates, confidence, warnings, and per-person item results.
-- [ ] Keep deterministic restriction matching and restaurant ranking as a separate backend feature; use `project_specs.md` for its group-coverage, severity, and room-level-warning requirements.
-
-### 7. Verify, operate, and release
-
-- [ ] Add tests for URL/image validation, extraction failures, evidence requirements, stale/conflicting data, privacy isolation, review gating, image deletion, and report handling.
-- [ ] Build an evaluation set of representative Utah Valley menus and images; review extraction quality before enabling shared recommendations.
-- [ ] Add monitoring for source freshness/check failures, extraction success/failure, low-confidence output, review-queue age, report volume, and processing latency.
-- [ ] Create a maintainer runbook for failed source checks, stuck jobs, pending reviews, and AI-provider errors.
-- [ ] Confirm warnings consistently advise users to verify ingredients and preparation practices with restaurants; do not guarantee allergen-free food.
-- [ ] Deploy the first backend version and verify the frontend can use the agreed API in a shared environment.
+- [ ] Confirm the GitHub Pages build includes the catalog and publishes it with the frontend.
+- [ ] Add build checks so invalid catalog data blocks publication.
+- [ ] Keep AI assistance outside the public browser; do not add API keys or secrets to the site.
+- [ ] Document how to research, review, update, and publish catalog changes.
+- [ ] Track catalog coverage, evidence completeness, freshness, and validation failures as manual release checks.
 
 ## Eliza - Frontend
 
 ### Current focus
 
-- [ ] Agree with Mary on the frontend foundation, first screen flow, and API/data contract for group searches and restaurant results.
+- [ ] Agree with Mary on the frontend foundation, first screen flow, and static catalog/matching contract for group searches and restaurant results.
 
 ### Task list
 
@@ -86,9 +65,9 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Review the repository setup with Mary and choose the frontend framework, build tooling, styling approach, and local development workflow.
 - [x] Create a low-fidelity clickable prototype of the mobile-first group setup flow in [`wireframe.html`](wireframe.html): welcome, person details, need selection, group review, and results entry point.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
-- [ ] Agree with Mary on the request/response data needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
-- [ ] Agree on how the frontend receives processing progress, incomplete results, and API errors, including what to show while menu data is being processed.
-- [ ] Confirm temporary-search behavior with the backend, including what data can remain in browser state and when it should be cleared.
+- [ ] Agree with Mary on the static data and matching output needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
+- [ ] Define catalog loading, invalid-data, and incomplete-information states; there is no runtime menu-processing progress in v1.
+- [ ] Confirm temporary-search behavior in the browser, including whether group state is kept only in memory or in browser storage and when it is cleared.
 
 #### 2. Build the app shell
 
@@ -112,7 +91,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 #### 4. Build restaurant search and ranked results
 
-- [ ] Submit the group needs to the agreed backend interface without requesting the user's location; search the Utah Valley restaurant set.
+- [ ] Apply group needs to the published static catalog with deterministic browser-side matching; do not request the user's location and search the Utah County restaurant set.
 - [ ] Show a ranked restaurant list, prioritizing restaurants where every person has at least one suitable item. Do not require everyone to choose the same dish.
 - [ ] Show each restaurant's city and the most specific price information available.
 - [ ] For each restaurant, show the suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
@@ -123,14 +102,14 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 #### 5. Handle search and result states
 
-- [ ] Design loading and processing states, including a clear indication when results are not ready yet.
+- [ ] Design a catalog-loading state and clear errors if the static catalog is unavailable or invalid; matching runs in the browser and does not wait on menu processing.
 - [ ] Design useful empty states for no restaurants, no suitable items for a person, and incomplete menu information.
 - [ ] Handle backend/network errors and stale or missing source details without presenting unknown information as safe.
 - [ ] Let the organizer edit group needs and search again without rebuilding the group from scratch.
 
 #### 6. Integrate and polish
 
-- [ ] Connect the screens to the API contract agreed with Mary; use clearly labeled sample data only while the backend interface is unavailable.
+- [ ] Connect the screens to the static catalog and matching contract agreed with Mary; use clearly labeled sample data only while those are being built.
 - [ ] Check keyboard navigation, screen-reader labels, focus handling, readable warning hierarchy, and layouts at mobile and desktop widths.
 - [ ] Walk through the complete group-entry-to-results flow with representative group needs and menu results; record and fix issues before release.
 
@@ -142,11 +121,11 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ## Shared decisions and blockers
 
-- [ ] Record the selected backend stack and deployment target.
-- [ ] Record agreed API contracts and any frontend/backend dependencies.
+- [ ] Record the static catalog format/location and agreed frontend matching contract.
+- [ ] Record how AI-assisted facts are reviewed and how catalog updates are published to GitHub Pages.
 - [ ] Record the selected frontend stack, app structure, and local development workflow.
-- [ ] Decide temporary-session expiration, supported image types/size limits, and stale-data thresholds.
-- [ ] Decide how internal maintainers access the source list and review/report queues.
+- [ ] Decide how often maintainers review menu sources and when a fact is considered stale.
+- [ ] Confirm that user menu submissions and reports are out of scope for v1.
 
 ## Project references
 

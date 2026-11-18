@@ -2,7 +2,9 @@
 
 ## Product overview
 
-Food with Friends is a mobile-forward web app that helps a group choose restaurants where everyone can find something suitable for their dietary needs. The first version will focus on restaurants throughout Utah Valley and use real restaurant and menu information where feasible.
+Food with Friends is a mobile-forward web app that helps a group choose restaurants where everyone can find something suitable for their dietary needs. The first version will focus on restaurants throughout Utah County and use real restaurant and menu information where feasible.
+
+The site will be published on GitHub Pages. For the first version, restaurant menus and allergen facts are gathered from internet sources by the project maintainers, prepared with AI assistance, reviewed by a person, and committed as static catalog data before publication. Users do not submit menus or reports in v1. At runtime, the browser reads the published catalog and uses deterministic matching rules; AI is not called from the public website. Do not place AI credentials or other secrets in the client-side site.
 
 ## Group and dietary needs
 
@@ -37,7 +39,7 @@ Use this severity scale for each restriction:
 
 ## Restaurant search and recommendations
 
-- Search all restaurants in Utah Valley; do not ask for the user's location.
+- Search all restaurants in Utah County; do not ask for the user's location.
 - The main result view is a ranked list. A map could be a useful addition.
 - The highest ranking priority is whether every group member has at least one suitable menu item. People do not need to share the same dish.
 - Show specific menu items for specific people, including the person's name or nickname.
@@ -51,6 +53,7 @@ Use this severity scale for each restriction:
 
 - Use real restaurant and menu data where feasible.
 - Prefer official restaurant menus, websites, and statements. Third-party sources, such as delivery apps and restaurant listings, can help find candidate dishes but may be incomplete or out of date.
+- Maintain the v1 catalog manually from public internet sources. AI may help structure candidate menu facts, but a project maintainer must check the evidence before committing the data for publication.
 - Make the source of each menu detail visible, with a source link, a last-checked date, and a confidence label.
 - Explain the evidence and uncertainty around ingredients and cross-contamination. A menu description alone may not establish whether a dish is safe, particularly for severe restrictions.
 - Clearly advise users to confirm uncertain ingredients, preparation practices, and cross-contamination concerns directly with the restaurant.
