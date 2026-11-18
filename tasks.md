@@ -6,15 +6,15 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ## Current focus
 
-- **Mary - Backend:** [ ] Choose the backend stack and agree on the first API/data contract with Eliza.
-- **Eliza - Frontend:** Add current focus here.
+- **Mary - Backend:** [ ] Agree on the first API/data contract with Eliza for the selected Next.js + Supabase stack.
+- **Eliza - Frontend:** [ ] Agree on the first API/data contract and local workflow with Mary for the selected Next.js + Supabase stack.
 
 ## Mary - Backend
 
 ### 1. Decide the backend foundation
 
-- [ ] Choose backend language/framework and project structure.
-- [ ] Choose database and initial hosting/deployment target.
+- [x] Choose Next.js + Supabase as the initial app/backend stack, with Supabase Postgres as the database.
+- [ ] Choose the Next.js deployment target and shared development environment.
 - [ ] Choose a background-job/queue approach for weekly source checks and menu processing.
 - [ ] Choose an AI provider/model for menu text and image extraction; confirm structured-output and image support.
 - [ ] Decide maintainer authentication and how temporary, private search sessions are identified.
@@ -83,7 +83,8 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 #### 1. Define the frontend foundation and contract
 
-- [ ] Review the repository setup with Mary and choose the frontend framework, build tooling, styling approach, and local development workflow.
+- [x] Choose Next.js + Supabase as the initial frontend and data foundation.
+- [ ] Agree with Mary on the project structure, styling approach, and local development workflow.
 - [x] Create a low-fidelity clickable prototype of the mobile-first group setup and restaurant browsing flow in [`wireframe.html`](wireframe.html): group review, best and partial matches, no-match state, restaurant details, and meal details.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
 - [ ] Agree with Mary on the request/response data needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
@@ -130,7 +131,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Design loading and processing states, including a clear indication when results are not ready yet.
 - [ ] Design useful empty states for no restaurants, no suitable items for a person, and incomplete menu information.
 - [ ] Handle backend/network errors and stale or missing source details without presenting unknown information as safe.
-- [ ] Let the organizer edit group needs and search again without rebuilding the group from scratch.
+- [ ] Keep an **Edit group** control available on results, restaurant, and meal pages so the organizer can update needs and search again without rebuilding the group.
 
 #### 6. Integrate and polish
 
@@ -146,9 +147,10 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ## Shared decisions and blockers
 
-- [ ] Record the selected backend stack and deployment target.
-- [ ] Record agreed API contracts and any frontend/backend dependencies.
-- [ ] Record the selected frontend stack, app structure, and local development workflow.
+- [x] Record Next.js + Supabase as the selected stack.
+- [ ] Record the Next.js deployment target and shared development environment.
+- [ ] Review and confirm the proposed group-search API contract with Mary: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md).
+- [ ] Record the app structure and local development workflow.
 - [ ] Decide temporary-session expiration, supported image types/size limits, and stale-data thresholds.
 - [ ] Decide how internal maintainers access the source list and review/report queues.
 
@@ -169,3 +171,4 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 - Product requirements: [`project_specs.md`](project_specs.md)
 - Backend menu data plan: [`documents/back-end/menu-data-and-evidence-pipeline.md`](documents/back-end/menu-data-and-evidence-pipeline.md)
+- Proposed group search API contract: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md)

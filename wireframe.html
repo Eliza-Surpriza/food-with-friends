@@ -30,6 +30,8 @@
     .app { min-height: 100svh; display: flex; justify-content: center; padding: 20px; }
     .device { width: min(100%, 460px); min-height: min(880px, calc(100svh - 40px)); display: flex; flex-direction: column; overflow: hidden; background: var(--paper); border: 1px solid #e5e8e4; border-radius: 28px; box-shadow: 0 18px 55px #25312b12; }
     .topbar { min-height: 66px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #edf0ec; }
+    .header-action { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: white; font-size: 13px; font-weight: 700; }
+    .header-action:hover { background: #f7f8f5; }
     .brand { display: inline-flex; gap: 9px; align-items: center; font-weight: 750; letter-spacing: -.03em; }
     .brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--green); font-size: 15px; }
     main { display: flex; flex: 1; flex-direction: column; padding: 24px 22px 20px; }
@@ -182,7 +184,8 @@
       </svg>`;
     }
     function header() {
-      return `<header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">f</span>Food with Friends</div></header>`;
+      const canEditGroup = ["results", "restaurant", "meal"].includes(state.view);
+      return `<header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">f</span>Food with Friends</div>${canEditGroup ? `<button class="header-action" data-action="edit-group">Edit group</button>` : ""}</header>`;
     }
     function shell(note, content) {
       app.innerHTML = `${header(note)}<main>${content}</main>`;
@@ -285,7 +288,6 @@
       if (state.resultScenario === "none") {
         shell("", `<section class="content">
           <h1>No matches</h1>
-          <button class="button button-secondary" data-action="edit-group">Edit group</button>
         </section>`);
         return;
       }
@@ -295,7 +297,6 @@
         shell("", `<section class="content">
           <h1>No matches for everyone</h1>
           ${groups.map((group, index) => `<section class="partial-section"><h2>${group.map(person => escapeHtml(person.name)).join(" & ")}</h2>${restaurantListMarkup(index)}</section>`).join("")}
-          <button class="button button-secondary" data-action="edit-group">Edit group</button>
         </section>`);
         return;
       }

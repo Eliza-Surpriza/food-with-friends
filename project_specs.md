@@ -43,6 +43,7 @@ Use this severity scale for each restriction:
 - If no restaurant works for everyone, show partial matches grouped by the people each restaurant works for. A restaurant may appear in more than one group, and groups covering more people appear first.
 - If no restaurant works for anyone in the group, show a **No matches** state with an option to edit the group and search again.
 - Selecting a restaurant opens its detail page. Show each person's meal ideas in a horizontally scrollable row; the page itself can scroll vertically for more information.
+- Keep an **Edit group** control available on the results, restaurant, and meal pages so the organizer can revise the group at any point during browsing.
 - Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
