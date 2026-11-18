@@ -40,6 +40,10 @@ Use this severity scale for each restriction:
 - Search all restaurants in Utah Valley; do not ask for the user's location.
 - The main result view is a ranked list. A map could be a useful addition.
 - The highest ranking priority is whether every group member has at least one suitable menu item. People do not need to share the same dish.
+- If no restaurant works for everyone, show partial matches grouped by the people each restaurant works for. A restaurant may appear in more than one group, and groups covering more people appear first.
+- If no restaurant works for anyone in the group, show a **No matches** state with an option to edit the group and search again.
+- Selecting a restaurant opens its detail page. Show each person's meal ideas in a horizontally scrollable row; the page itself can scroll vertically for more information.
+- Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
 - Show each restaurant's city and the most specific price information available, such as an entrée price range when listed.
@@ -52,6 +56,7 @@ Use this severity scale for each restriction:
 - Use real restaurant and menu data where feasible.
 - Prefer official restaurant menus, websites, and statements. Third-party sources, such as delivery apps and restaurant listings, can help find candidate dishes but may be incomplete or out of date.
 - Make the source of each menu detail visible, with a source link, a last-checked date, and a confidence label.
+- Show sources and warnings at both the restaurant level and the individual meal level.
 - Explain the evidence and uncertainty around ingredients and cross-contamination. A menu description alone may not establish whether a dish is safe, particularly for severe restrictions.
 - Clearly advise users to confirm uncertain ingredients, preparation practices, and cross-contamination concerns directly with the restaurant.
 

@@ -84,7 +84,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 #### 1. Define the frontend foundation and contract
 
 - [ ] Review the repository setup with Mary and choose the frontend framework, build tooling, styling approach, and local development workflow.
-- [x] Create a low-fidelity clickable prototype of the mobile-first group setup flow in [`wireframe.html`](wireframe.html): welcome, person details, need selection, group review, and results entry point.
+- [x] Create a low-fidelity clickable prototype of the mobile-first group setup and restaurant browsing flow in [`wireframe.html`](wireframe.html): group review, best and partial matches, no-match state, restaurant details, and meal details.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
 - [ ] Agree with Mary on the request/response data needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
 - [ ] Agree on how the frontend receives processing progress, incomplete results, and API errors, including what to show while menu data is being processed.
@@ -114,9 +114,13 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 - [ ] Submit the group needs to the agreed backend interface without requesting the user's location; search the Utah Valley restaurant set.
 - [ ] Show a ranked restaurant list, prioritizing restaurants where every person has at least one suitable item. Do not require everyone to choose the same dish.
+- [ ] If no restaurant works for the whole group, show partial matches grouped by the people they work for; allow a restaurant to appear in multiple groups and sort groups from most people covered to fewest.
+- [ ] If there are no matches for anyone, show a no-matches state with an option to edit the group and search again.
 - [ ] Show each restaurant's city and the most specific price information available.
-- [ ] For each restaurant, show the suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
-- [ ] Show the source link, last-checked date, confidence label, and relevant ingredient or cross-contamination warnings for each menu item.
+- [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
+- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, sources, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
+- [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
+- [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
 - [ ] Show a strong warning for room-level restrictions while allowing the user to decide whether to consider that restaurant.
 - [ ] Tell users to confirm uncertain ingredients and preparation practices with the restaurant; never label a dish as guaranteed allergen-free.
