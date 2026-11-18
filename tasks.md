@@ -63,7 +63,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 #### 1. Define the frontend foundation and contract
 
 - [ ] Review the repository setup with Mary and choose the frontend framework, build tooling, styling approach, and local development workflow.
-- [x] Create a low-fidelity clickable prototype of the mobile-first group setup flow in [`wireframe.html`](wireframe.html): welcome, person details, need selection, group review, and results entry point.
+- [x] Create a low-fidelity clickable prototype of the mobile-first group setup and restaurant browsing flow in [`wireframe.html`](wireframe.html): group review, best and partial matches, no-match state, restaurant details, and meal details.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
 - [ ] Agree with Mary on the static data and matching output needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
 - [ ] Define catalog loading, invalid-data, and incomplete-information states; there is no runtime menu-processing progress in v1.
@@ -93,9 +93,13 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 - [ ] Apply group needs to the published static catalog with deterministic browser-side matching; do not request the user's location and search the Utah County restaurant set.
 - [ ] Show a ranked restaurant list, prioritizing restaurants where every person has at least one suitable item. Do not require everyone to choose the same dish.
+- [ ] If no restaurant works for the whole group, show partial matches grouped by the people they work for; allow a restaurant to appear in multiple groups and sort groups from most people covered to fewest.
+- [ ] If there are no matches for anyone, show a no-matches state with an option to edit the group and search again.
 - [ ] Show each restaurant's city and the most specific price information available.
-- [ ] For each restaurant, show the suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
-- [ ] Show the source link, last-checked date, confidence label, and relevant ingredient or cross-contamination warnings for each menu item.
+- [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
+- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, sources, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
+- [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
+- [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
 - [ ] Show a strong warning for room-level restrictions while allowing the user to decide whether to consider that restaurant.
 - [ ] Tell users to confirm uncertain ingredients and preparation practices with the restaurant; never label a dish as guaranteed allergen-free.
@@ -126,6 +130,19 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Record the selected frontend stack, app structure, and local development workflow.
 - [ ] Decide how often maintainers review menu sources and when a fact is considered stale.
 - [ ] Confirm that user menu submissions and reports are out of scope for v1.
+
+## First end-to-end integration
+
+- [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
+- [ ] **Mary + Eliza:** Define the search request: people, unique nicknames, restriction types or custom needs, and severity levels.
+- [ ] **Mary + Eliza:** Define the search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, sources, last-checked dates, confidence, and warnings.
+- [ ] **Mary - Backend:** Provide an initial restaurant-search/recommendation endpoint using curated or seed menu data, including full matches, partial matches, and no-match results.
+- [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
+- [ ] **Eliza - Frontend:** Build the API connection and replace the wireframe's sample result data with backend responses.
+- [ ] **Eliza - Frontend:** Connect loading, processing, error, full-match, partial-match, and no-match states to the agreed API behavior.
+- [ ] **Mary + Eliza:** Run both apps together locally and resolve API URL, CORS, and configuration issues.
+- [ ] **Mary + Eliza:** Walk through group entry → search → restaurant details → meal details using representative full, partial, and empty results; fix issues found.
+- [ ] **Mary + Eliza:** Deploy a shared development version and confirm the frontend can reach the backend there.
 
 ## Project references
 

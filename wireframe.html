@@ -110,10 +110,21 @@
     .dialog-actions .button { flex: 1; }
     .button-danger { color: white; background: var(--red); }
     .button-danger:hover { background: #85241f; }
-    .results-placeholder { margin-top: 24px; padding: 18px; border: 1px dashed #aab5ad; border-radius: 16px; background: #fafbf9; }
-    .result-skeleton { height: 14px; margin: 12px 0; border-radius: 7px; background: #e9ede8; }
-    .result-skeleton.short { width: 56%; }
-    .demo-tag { display: inline-block; margin-top: 16px; padding: 6px 9px; border-radius: 999px; color: #516258; background: #eef2ed; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .restaurant-list { display: grid; gap: 10px; margin-top: 18px; }
+    .restaurant-card { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; color: var(--ink); background: white; text-align: left; }
+    .restaurant-card:hover, .meal-card:hover { border-color: #78a88a; background: #f9fbf9; }
+    .restaurant-title { display: block; font-weight: 750; }
+    .restaurant-meta { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .meal-section { margin: 22px 0; }
+    .meal-section h2, .detail-section h2 { margin: 0 0 10px; font-size: 15px; }
+    .meal-row { display: flex; gap: 10px; overflow-x: auto; padding: 2px 1px 8px; scroll-snap-type: x mandatory; }
+    .meal-card { min-width: 126px; min-height: 78px; flex: 0 0 126px; padding: 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: white; text-align: left; scroll-snap-align: start; }
+    .detail-section { margin: 22px 0; padding-top: 14px; border-top: 1px solid #edf0ec; }
+    .detail-placeholder { width: min(100%, 250px); height: 8px; border-radius: 6px; background: #edf0ec; }
+    .detail-value { color: var(--muted); font-size: 14px; }
+    .partial-section { margin: 22px 0; }
+    .partial-section h2 { margin-bottom: 10px; font-size: 16px; }
+    .meal-detail-person { margin: 12px 0 20px; color: var(--muted); font-size: 14px; }
     @media (max-width: 560px) {
       .app { min-height: 100svh; padding: 0; background: white; }
       .device { width: 100%; min-height: 100svh; border: 0; border-radius: 0; box-shadow: none; }
@@ -137,6 +148,10 @@
       { id: 3, title: "I can't eat anything that touches this", description: "Cross-contamination is a concern." },
       { id: 4, title: "I can't be in a room with this", description: "Most severe; potentially life-threatening." }
     ];
+    const demoRestaurants = [
+      { id: "restaurant-1", name: "Restaurant 1" },
+      { id: "restaurant-2", name: "Restaurant 2" }
+    ];
     const state = {
       view: "welcome",
       people: [],
@@ -148,7 +163,11 @@
       customValue: "",
       activeNeedId: null,
       pendingRemoval: null,
-      pendingExit: false
+      pendingExit: false,
+      selectedRestaurant: null,
+      selectedMeal: null,
+      selectedGroupPeople: null,
+      resultScenario: "best"
     };
     const app = document.getElementById("app");
 
@@ -175,6 +194,8 @@
       if (state.view === "severity-picker") return renderSeverityPicker();
       if (state.view === "group") return renderGroup();
       if (state.view === "results") return renderResults();
+      if (state.view === "restaurant") return renderRestaurant();
+      if (state.view === "meal") return renderMeal();
     }
     function renderWelcome() {
       shell("", `<section class="welcome">
@@ -261,9 +282,73 @@
         <footer class="group-foot"><button class="button button-primary button-search" data-action="search" aria-label="Search restaurants" title="Search restaurants" ${state.people.length ? "" : "disabled"}>⌕</button></footer>`);
     }
     function renderResults() {
+      if (state.resultScenario === "none") {
+        shell("", `<section class="content">
+          <h1>No matches</h1>
+          <button class="button button-secondary" data-action="edit-group">Edit group</button>
+        </section>`);
+        return;
+      }
+      if (state.resultScenario === "partial") {
+        const groups = partialGroups();
+        if (!groups.length) { state.resultScenario = "none"; return renderResults(); }
+        shell("", `<section class="content">
+          <h1>No matches for everyone</h1>
+          ${groups.map((group, index) => `<section class="partial-section"><h2>${group.map(person => escapeHtml(person.name)).join(" & ")}</h2>${restaurantListMarkup(index)}</section>`).join("")}
+          <button class="button button-secondary" data-action="edit-group">Edit group</button>
+        </section>`);
+        return;
+      }
       shell("", `<section class="content">
-        <button class="back-link" data-action="back-to-group" aria-label="Back to group"><span aria-hidden="true">←</span></button>
-        <h1>Restaurant results</h1>
+        <h1>Best matches</h1>
+        <div class="restaurant-list">${restaurantListMarkup()}</div>
+      </section>`);
+    }
+    function restaurantListMarkup(groupIndex = 0) {
+      return demoRestaurants.map(restaurant => `<button class="restaurant-card" data-action="open-restaurant" data-id="${restaurant.id}" data-group="${groupIndex}">
+        <span><span class="restaurant-title">${restaurant.name}</span><span class="restaurant-meta">City · Price</span></span><span class="chevron" aria-hidden="true">›</span>
+      </button>`).join("");
+    }
+    function partialGroups() {
+      const people = state.people;
+      if (people.length < 2) return [];
+      if (people.length === 2) return [[people[0]], [people[1]]];
+      return [people.slice(0, -1), people.slice(1)];
+    }
+    function renderRestaurant() {
+      const restaurant = selectedRestaurant();
+      if (!restaurant) { state.view = "results"; return render(); }
+      const people = state.selectedGroupPeople || state.people;
+      const mealRows = people.map(person => `<section class="meal-section">
+        <h2>${escapeHtml(person.name)}</h2>
+        <div class="meal-row" aria-label="Meal ideas for ${escapeHtml(person.name)}">${[1, 2, 3].map(index => `<button class="meal-card" data-action="open-meal" data-person="${escapeHtml(person.name)}" data-meal="Meal idea ${index}">Meal idea ${index}</button>`).join("")}</div>
+      </section>`).join("");
+      shell("", `<section class="content">
+        <button class="back-link" data-action="back-to-results" aria-label="Back to results"><span aria-hidden="true">←</span></button>
+        <h1>${escapeHtml(restaurant.name)}</h1>
+        <p class="restaurant-meta">City · Price</p>
+        ${mealRows}
+        <section class="detail-section"><h2>Sources</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+        <section class="detail-section"><h2>Warnings</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+      </section>`);
+    }
+    function selectedRestaurant() {
+      return demoRestaurants.find(item => item.id === state.selectedRestaurant) || null;
+    }
+    function renderMeal() {
+      const restaurant = selectedRestaurant();
+      const meal = state.selectedMeal;
+      if (!restaurant || !meal) { state.view = "restaurant"; return render(); }
+      shell("", `<section class="content">
+        <button class="back-link" data-action="back-to-restaurant" aria-label="Back to ${escapeHtml(restaurant.name)}"><span aria-hidden="true">←</span></button>
+        <h1>${escapeHtml(meal.name)}</h1>
+        <p class="meal-detail-person">${escapeHtml(restaurant.name)} · ${escapeHtml(meal.person)}</p>
+        <section class="detail-section"><h2>Description</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+        <section class="detail-section"><h2>Ingredients</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+        <section class="detail-section"><h2>Price</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+        <section class="detail-section"><h2>Match for ${escapeHtml(meal.person)}</h2><div class="detail-value">As listed or with a modification</div></section>
+        <section class="detail-section"><h2>Sources</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
+        <section class="detail-section"><h2>Warnings</h2><div class="detail-placeholder" aria-hidden="true"></div></section>
       </section>`);
     }
     function removalDialog() {
@@ -390,8 +475,32 @@
       }
       if (action === "add-person") { beginNewPerson(); return; }
       if (action === "edit-person") { openEditPerson(Number(button.dataset.index)); return; }
-      if (action === "search") { state.view = "results"; render(); return; }
+      if (action === "search") {
+        const scenario = new URLSearchParams(window.location.search).get("results");
+        state.resultScenario = ["partial", "none"].includes(scenario) ? scenario : "best";
+        state.view = "results";
+        render();
+        return;
+      }
       if (action === "back-to-group") { state.view = "group"; render(); return; }
+      if (action === "edit-group") { state.view = "group"; render(); return; }
+      if (action === "open-restaurant") {
+        state.selectedRestaurant = button.dataset.id;
+        state.selectedGroupPeople = state.resultScenario === "partial"
+          ? partialGroups()[Number(button.dataset.group)]
+          : state.people;
+        state.view = "restaurant";
+        render();
+        return;
+      }
+      if (action === "open-meal") {
+        state.selectedMeal = { name: button.dataset.meal, person: button.dataset.person };
+        state.view = "meal";
+        render();
+        return;
+      }
+      if (action === "back-to-results") { state.view = "results"; render(); return; }
+      if (action === "back-to-restaurant") { state.view = "restaurant"; render(); return; }
     });
     app.addEventListener("submit", event => {
       if (event.target.id === "custom-form") {
