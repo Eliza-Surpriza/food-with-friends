@@ -51,6 +51,13 @@ Use this severity scale for each restriction:
 - When useful menu information is uncertain or incomplete, include the restaurant with a clear warning and rank it below restaurants with stronger evidence of suitable dishes.
 - For a room-level restriction, show the restaurant with a strong warning so the user can decide whether to consider it; do not automatically hide it.
 - When information is uncertain, tell the user to check with the restaurant before relying on the recommendation.
+- Use an AI recommendation service to select and rank menu items from the reviewed catalog for the current group's restrictions. AI may suggest a clearly stated modification, such as asking for a salad without croutons, and should say whether the item appears to be a full meal, a side, or unclear.
+- Prioritize a suitable full meal for each person. If a restaurant has no suitable full-meal option for a person, offer a suitable side as a fallback and label it clearly as a side. Group coverage remains the highest restaurant-ranking priority.
+- AI recommendations must use catalog facts, not invented menu knowledge. For each key ingredient, allergen, modification, or meal-role statement, show a direct link to the supporting menu or allergen guide when available. Do not fabricate citations.
+- If no allergen guide or supporting source is available, say so and show the source that is available; do not imply that the missing guide confirmed anything.
+- For a known ingredient conflict, do not label the dish suitable as listed for a person who will not eat that ingredient. AI may offer an order-time modification as a separate suggestion, but must not describe removing an ingredient after serving as proof that the conflict is gone.
+- AI suggestions are not safety guarantees. If cross-contact matters, ingredient removal alone is not enough; preparation information must be available and users should still confirm details with the restaurant. Preserve uncertainty when evidence is missing or conflicting.
+- AI must run behind a server-side endpoint so provider credentials are not exposed in browser code. A static-only host requires a separate secure backend for this feature.
 
 ## Menu information, sources, and trust
 
@@ -64,5 +71,13 @@ Use this severity scale for each restriction:
 ## Later features
 
 - Cuisine and price filters are not an immediate need and may be added later.
+- Let users choose a meal preference, such as full meals only or allowing side dishes as fallbacks. Until then, prioritize full meals and show sides only when no suitable full-meal option is available for that person at that restaurant. Whether this choice applies per person or to the whole group remains open.
 - Saving dietary profiles for reuse may be added later; searches can be temporary in the first version.
 - People can rate a restaurant based on how it took care of their allergy needs.
+
+## Change history
+
+| Date and time | Change |
+| --- | --- |
+| 2026-11-18 15:02 America/Denver | Added evidence-linked AI menu recommendations, modification suggestions, meal-versus-side labels, and server-side hosting requirements. |
+| 2026-11-18 15:10 America/Denver | Set full-meal priority with clearly labeled side fallbacks and deferred user meal-preference controls. |

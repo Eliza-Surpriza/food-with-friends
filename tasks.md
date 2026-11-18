@@ -6,72 +6,54 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ## Current focus
 
-- **Mary - Backend:** [ ] Agree on the first API/data contract with Eliza for the selected Next.js + Supabase stack.
-- **Eliza - Frontend:** [ ] Agree on the first API/data contract and local workflow with Mary for the selected Next.js + Supabase stack.
+- **Mary - Backend:** [ ] Agree with Eliza on catalog storage/deployment, the menu evidence schema, and how group search consumes the published catalog.
+- **Eliza - Frontend:** [ ] Agree with Mary on the catalog/search interface and local workflow for the first group-search flow.
 
 ## Mary - Backend
 
-### 1. Decide the backend foundation
+### 1. Confirm the backend and catalog boundary
 
 - [x] Choose Next.js + Supabase as the initial app/backend stack, with Supabase Postgres as the database.
-- [ ] Choose the Next.js deployment target and shared development environment.
-- [ ] Choose a background-job/queue approach for weekly source checks and menu processing.
-- [ ] Choose an AI provider/model for menu text and image extraction; confirm structured-output and image support.
-- [ ] Decide maintainer authentication and how temporary, private search sessions are identified.
-- [ ] Agree with Eliza on initial API contracts, error/loading states, and what data the frontend needs for a menu preview.
+- [ ] Confirm a server-side deployment for runtime AI and whether the reviewed catalog is stored as files or Supabase records; GitHub Pages alone cannot host the protected AI endpoint.
+- [ ] Agree with Eliza on restaurant, source, menu item, allergen/ingredient fact, evidence, and modification fields.
+- [ ] Confirm common restriction keys and how custom restrictions map to known catalog concepts; unmatched needs remain uncertain.
+- [ ] Agree on the group-search request/response and frontend loading/error states.
+- [ ] Choose a server-side AI provider/model for search-time recommendations and catalog preparation; define secret handling, cost/latency limits, and failure behavior.
 
-### 2. Get a runnable backend skeleton
+### 2. Define the AI-assisted catalog workflow
 
-- [ ] Scaffold the backend app with environment-based configuration and secret handling.
-- [ ] Add a health/readiness endpoint, structured logging, and centralized error handling.
-- [ ] Set up local development, database migrations, and a repeatable seed-data workflow.
-- [ ] Add CI checks and a first deployable development environment.
-- [ ] Write a short setup guide so both partners can run the backend locally.
+- [ ] Create a Utah Valley restaurant/source inventory, preferring official public menus and allergen statements.
+- [ ] Define a repeatable maintainer process to retrieve menu content and ask AI to propose menu items, ingredient/allergen facts, possible modifications, and fact-level evidence.
+- [ ] Require a maintainer to verify AI candidates against their sources before publishing; preserve unsupported or missing facts as unknown.
+- [ ] Decide how source excerpts, source/check dates, confidence, reviewer, and catalog revisions are represented.
+- [ ] Create a small representative catalog sample and use it to refine the data contract with Eliza.
 
-### 3. Define and persist the menu data
+### 3. Build the published catalog and validation
 
-- [ ] Design the first data model for restaurants, sources, source checks, menu items, extracted facts, evidence, submissions, review decisions, and user reports.
-- [ ] Represent source type, evidence, confidence, extraction version, and last-checked time for each relevant fact.
-- [ ] Represent `unknown` separately from an explicit claim that an ingredient/allergen is absent.
-- [ ] Add data access rules so private submissions cannot appear in the shared catalog before approval.
-- [ ] Define temporary preview and image-retention behavior; delete uploaded images after processing.
+- [ ] Implement the agreed catalog storage/import workflow for restaurants, sources, menu items, facts, evidence, and modifications.
+- [ ] Represent unknown separately from explicit restaurant statements about ingredients/allergens; do not treat missing facts as safe.
+- [ ] Add validation for stable unique IDs, required evidence, source links/dates, supported fact states, references, and duplicates.
+- [ ] Track changes and source freshness; retain last approved facts if a refresh attempt fails.
+- [ ] Ensure private group restrictions and AI credentials are never published in catalog data or browser code.
 
-### 4. Build menu-source ingestion and extraction
+### 4. Implement AI group recommendations
 
-- [ ] Implement maintainer operations to add/update curated restaurant source URLs.
-- [ ] Build a safe URL fetcher for public sources with redirect, timeout, response-size, and network-access limits.
-- [ ] Extract readable menu content from supported web pages and keep the source URL and retrieval time.
-- [ ] Add image upload validation and menu text extraction for supported image types.
-- [ ] Define the AI extraction contract for menu items, ingredient/allergen statements, possible modifications, supporting evidence, confidence, and extraction version.
-- [ ] Validate AI output and reject or flag facts without supporting evidence; never convert missing information into an allergen-free claim.
-- [ ] Add deduplication and handling for changed menus, stale facts, and conflicting sources.
-- [ ] Add a weekly job for curated sources and a maintainer-triggered refresh.
-- [ ] Track processing states: queued, processing, completed, needs review, and failed.
+- [ ] Implement the agreed server-side AI search interface over reviewed catalog facts; do not use uncataloged menu claims or expose provider credentials.
+- [ ] Have AI select and rank candidates by person, apply the four severity meanings, and distinguish as-listed, possible-with-modification, and uncertain suggestions.
+- [ ] Let AI suggest specific modifications and label each suggestion as a full meal, side, or unclear based on menu evidence.
+- [ ] Require menu/allergen-guide citations from catalog source IDs for key claims; reject unsupported citations and preserve unknowns.
+- [ ] Rank full group coverage first, then partial groups by people covered; preserve strong room-level warnings and cross-contact uncertainty.
+- [ ] Return source links, evidence, confidence, last-checked dates, prices, city, serving role, and warnings for frontend display.
+- [ ] Handle invalid requests/catalog data, unknown restrictions, no matches, AI timeout/provider errors, malformed output, and invalid citations.
 
-### 5. Add private submissions, review, and reports
+### 5. Verify and maintain the catalog/search feature
 
-- [ ] Accept an organizer's URL or menu image for a temporary private preview.
-- [ ] Return submission status and preview results without exposing them to other users or the shared catalog.
-- [ ] Delete the original uploaded image after processing while retaining extracted evidence for the preview/review flow.
-- [ ] Build maintainer review actions to approve or reject user-submitted facts before shared publication.
-- [ ] Add user reports for incorrect or concerning menu information and route them to an internal follow-up queue.
-- [ ] Ensure reports do not automatically edit, hide, or reclassify menu facts.
-
-### 6. Expose menu facts and prepare for recommendations
-
-- [ ] Create a read interface for the recommendation service with menu facts, evidence, source, freshness, confidence, and uncertainty.
-- [ ] Preserve whether an item is listed as-is, may work with a stated modification, or is uncertain.
-- [ ] Coordinate with Eliza on the response data needed to show source links, last-checked dates, confidence, warnings, and per-person item results.
-- [ ] Keep deterministic restriction matching and restaurant ranking as a separate backend feature; use `project_specs.md` for its group-coverage, severity, and room-level-warning requirements.
-
-### 7. Verify, operate, and release
-
-- [ ] Add tests for URL/image validation, extraction failures, evidence requirements, stale/conflicting data, privacy isolation, review gating, image deletion, and report handling.
-- [ ] Build an evaluation set of representative Utah Valley menus and images; review extraction quality before enabling shared recommendations.
-- [ ] Add monitoring for source freshness/check failures, extraction success/failure, low-confidence output, review-queue age, report volume, and processing latency.
-- [ ] Create a maintainer runbook for failed source checks, stuck jobs, pending reviews, and AI-provider errors.
+- [ ] Build representative catalog examples covering known, unknown, conflicting, stale, and modifiable facts, plus custom restrictions.
+- [ ] Evaluate extraction and recommendation outputs against catalog evidence, citation correctness, severity behavior, meal/side labeling, and modification advice.
+- [ ] Track catalog coverage, evidence completeness, stale/conflicting facts, AI correction rates, citation completeness, model failures/latency, validation failures, and search errors.
+- [ ] Write a maintainer guide for collecting, reviewing, and publishing menu updates.
 - [ ] Confirm warnings consistently advise users to verify ingredients and preparation practices with restaurants; do not guarantee allergen-free food.
-- [ ] Deploy the first backend version and verify the frontend can use the agreed API in a shared environment.
+- [ ] Integrate and deploy the search interface using the deployment approach agreed with Eliza.
 
 ## Eliza - Frontend
 
@@ -87,9 +69,9 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Agree with Mary on the project structure, styling approach, and local development workflow.
 - [x] Create a low-fidelity clickable prototype of the mobile-first group setup and restaurant browsing flow in [`wireframe.html`](wireframe.html): group review, best and partial matches, no-match state, restaurant details, and meal details.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
-- [ ] Agree with Mary on the request/response data needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
-- [ ] Agree on how the frontend receives processing progress, incomplete results, and API errors, including what to show while menu data is being processed.
-- [ ] Confirm temporary-search behavior with the backend, including what data can remain in browser state and when it should be cleared.
+- [ ] Agree with Mary on the AI search request/response data for participants, restrictions and severity, per-person suggestions, modifications, full-meal/side labels, evidence citations, warnings, restaurant city, and prices.
+- [ ] Define catalog loading, invalid-data, incomplete-information, and search-error states; menu extraction is maintainer-side and does not create user-facing processing progress in v1.
+- [ ] Confirm temporary-search behavior, including what group data remains in browser state and when it is cleared.
 
 #### 2. Build the app shell
 
@@ -119,7 +101,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] If there are no matches for anyone, show a no-matches state with an option to edit the group and search again.
 - [ ] Show each restaurant's city and the most specific price information available.
 - [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
-- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, sources, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
+- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, whether it is a full meal or side, the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
 - [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
 - [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
@@ -128,7 +110,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 #### 5. Handle search and result states
 
-- [ ] Design loading and processing states, including a clear indication when results are not ready yet.
+- [ ] Design catalog/search loading and error states; menu extraction is maintainer-side and is not part of the user's live search.
 - [ ] Design useful empty states for no restaurants, no suitable items for a person, and incomplete menu information.
 - [ ] Handle backend/network errors and stale or missing source details without presenting unknown information as safe.
 - [ ] Keep an **Edit group** control available on results, restaurant, and meal pages so the organizer can update needs and search again without rebuilding the group.
@@ -142,6 +124,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 #### Later frontend features
 
 - [ ] Add cuisine and price filters after the core matching flow is working.
+- [ ] Add a user preference for full meals only or allowing sides as fallbacks; decide whether it applies per person or to the whole group. Default behavior prioritizes full meals and labels side fallbacks clearly.
 - [ ] Consider a map view alongside the ranked list.
 - [ ] Consider saving dietary profiles for reuse; persistent profiles are not part of the first version.
 
@@ -151,18 +134,18 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Record the Next.js deployment target and shared development environment.
 - [ ] Review and confirm the proposed group-search API contract with Mary: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md).
 - [ ] Record the app structure and local development workflow.
-- [ ] Decide temporary-session expiration, supported image types/size limits, and stale-data thresholds.
-- [ ] Decide how internal maintainers access the source list and review/report queues.
+- [ ] Decide how maintainers review and publish menu catalog changes and when facts are considered stale.
+- [ ] Confirm user menu submissions and reports remain out of scope for v1.
 
 ## First end-to-end integration
 
 - [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
 - [ ] **Mary + Eliza:** Define the search request: people, unique nicknames, restriction types or custom needs, and severity levels.
-- [ ] **Mary + Eliza:** Define the search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, sources, last-checked dates, confidence, and warnings.
-- [ ] **Mary - Backend:** Provide an initial restaurant-search/recommendation endpoint using curated or seed menu data, including full matches, partial matches, and no-match results.
+- [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, menu/allergen-guide citations, last-checked dates, confidence, and warnings.
+- [ ] **Mary - Backend:** Provide the agreed search interface using reviewed catalog data, including full matches, partial matches, and no-match results.
 - [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
 - [ ] **Eliza - Frontend:** Build the API connection and replace the wireframe's sample result data with backend responses.
-- [ ] **Eliza - Frontend:** Connect loading, processing, error, full-match, partial-match, and no-match states to the agreed API behavior.
+- [ ] **Eliza - Frontend:** Connect catalog/search loading, error, full-match, partial-match, and no-match states to the agreed interface.
 - [ ] **Mary + Eliza:** Run both apps together locally and resolve API URL, CORS, and configuration issues.
 - [ ] **Mary + Eliza:** Walk through group entry → search → restaurant details → meal details using representative full, partial, and empty results; fix issues found.
 - [ ] **Mary + Eliza:** Deploy a shared development version and confirm the frontend can reach the backend there.
@@ -172,3 +155,12 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - Product requirements: [`project_specs.md`](project_specs.md)
 - Backend menu data plan: [`documents/back-end/menu-data-and-evidence-pipeline.md`](documents/back-end/menu-data-and-evidence-pipeline.md)
 - Proposed group search API contract: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md)
+
+## Change history
+
+| Date and time | Change |
+| --- | --- |
+| 2026-11-18 14:48 America/Denver | Replaced v1 upload/report ingestion tasks with AI-assisted catalog preparation and deterministic group search. |
+| 2026-11-18 15:02 America/Denver | Added server-side AI selection, modification, meal-role, and source-citation tasks. |
+| 2026-11-18 15:03 America/Denver | Clarified that AI owns menu selection and ranking; deterministic checks validate citations and hard constraints. |
+| 2026-11-18 15:10 America/Denver | Recorded full-meal-first recommendations, labeled side fallback, and future user preference control. |

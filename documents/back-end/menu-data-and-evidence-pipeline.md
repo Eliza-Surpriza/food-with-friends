@@ -1,137 +1,156 @@
-# Menu Data and Evidence Pipeline
+# Static Menu Catalog and AI-Assisted Preparation
 
 ## Summary
 
-Define a backend pipeline that turns internally curated restaurant sources and user-submitted URLs or menu images into traceable menu facts. AI extracts candidate information; deterministic rules and a separate recommendation service consume those facts. Keep the backend technology stack open.
+Build a reviewed catalog of Utah Valley restaurant menus and allergen-related facts from public internet sources. AI helps maintainers find and structure candidate menu items and evidence before publication. A maintainer verifies the candidates and publishes the approved catalog. At search time, an AI recommendation service selects and ranks catalog items for the group's restrictions, proposes evidence-backed modifications, and explains its citations. It may only use the published catalog; it must not invent menu facts or claim that food is safe.
+
+The existing work board records Next.js and Supabase as the selected application stack. The exact catalog storage and deployment target still need confirmation with Eliza because the proposed `POST /api/search` contract requires a runtime endpoint, while a GitHub Pages-only site cannot run one.
 
 ## Problem and goals
 
-Restaurant menus and allergen details vary in source, completeness, and freshness. The backend must preserve the evidence, source, check time, and uncertainty behind each extracted fact so the product can present useful recommendations without implying that a dish is guaranteed safe.
+Restaurant menus and allergen details vary in source, completeness, and freshness. The application needs useful menu coverage while preserving the evidence and uncertainty behind each fact.
 
 Goals:
 
-- Build a maintainable Utah Valley restaurant and menu catalog using real sources where feasible.
-- Keep source provenance, supporting evidence, freshness, and confidence visible to downstream features.
-- Provide temporary, private previews from organizer-submitted URLs and menu images.
-- Require internal review before user-submitted information becomes shared catalog data.
-- Treat AI output as candidate data; do not have AI make unsupported safety guarantees.
+- Create a useful Utah Valley restaurant catalog from public sources, preferring official restaurant information.
+- Use AI to speed up menu discovery and structuring without treating AI output as verified fact.
+- Keep each published fact traceable to its source, supporting evidence, review status, confidence, and last-checked date.
+- Let AI select and rank menu items for the full group's needs, showing suitable-as-listed, possible-with-modification, and uncertain options.
+- State whether each suggestion appears to be a full meal, a side, or unclear, with the basis and its source when available.
+- Never imply that a restaurant or dish is guaranteed allergen-free.
 
 ## Users and permissions
 
-- **Organizer:** Submits a URL or image for a temporary private search preview. The submission cannot change shared data directly.
-- **Internal maintainer:** Manages the curated source list, reviews submissions for shared use, and follows up on reports. Access is restricted to internal maintainers; the authentication mechanism is TBD with the backend stack.
-- **Report submitter:** Reports a concern about menu information. A report enters an internal follow-up queue and does not directly edit or suppress a fact.
-- Persistent user accounts and dietary profiles are out of scope for v1. Associate private submissions with a temporary search/session; its exact token and expiration policy remain TBD.
+- **Organizer:** Sends the group's people and restrictions through the search flow and views matches from the published catalog. Persistent accounts and dietary profiles are not required for the first version.
+- **Maintainer:** Researches restaurant sources, uses AI to prepare candidate records, verifies evidence, and publishes catalog updates.
+- **Public visitor:** Can read published restaurant and menu facts through the website.
+
+User-submitted menus, uploads, and reports are out of scope for the first version, based on the earlier product decision. Only maintainers can change shared catalog data.
 
 ## Scope
 
-**In scope:** Internal restaurant/source registry; weekly checks of curated sources; URL and image intake for private previews; AI extraction and evidence capture; temporary image processing; review gating before shared publication; user reports; a read interface for recommendation logic.
+**In scope:** A curated restaurant/source list; manual or maintainer-triggered collection from public internet sources; AI-assisted menu extraction; human review; a versioned/published catalog; source and evidence metadata; runtime AI selection/ranking and modification suggestions grounded in the catalog; citation validation; validation and publication checks.
 
-**Out of scope:** Selecting a framework, database, hosting provider, queue, AI provider, or maintainer identity provider; persistent dietary profiles; automatic source discovery; the detailed restaurant matching and ranking algorithm; direct user edits to menu facts.
+**Out of scope for v1:** User menu uploads or reports, search-time web crawling or open-ended web research, automatic broad source discovery, persistent dietary profiles, and unreviewed catalog publication. A weekly automated refresh is also deferred; maintainers update the catalog as needed.
 
 ## Requirements and behavior
 
-### Pipeline responsibilities
+### Catalog collection and AI assistance
 
-1. Maintainers add and maintain restaurant sources, preferring official menus, restaurant websites, and restaurant statements.
-2. A scheduled job checks curated sources weekly. A maintainer can also trigger a check on demand. Record each attempt and its outcome.
-3. Organizers may submit a URL or image. Process it for their temporary private preview. It does not enter shared restaurant data until an internal maintainer reviews and approves the extracted information.
-4. AI extracts candidate restaurant, menu item, ingredient/allergen statements, and possible modifications. Capture source evidence for each relevant fact, not only a general citation for the whole menu.
-5. Persist approved, sourced facts in the shared catalog. Expose the catalog through a technology-neutral read interface for downstream matching.
-6. Accept user reports on menu or allergen information and route them to internal follow-up. Reports do not automatically modify, hide, or reclassify facts.
+1. A maintainer identifies a restaurant and its public source URLs. Prefer official restaurant menus, allergen statements, and restaurant websites. Clearly label third-party sources and use them as supporting sources when official details are unavailable.
+2. The maintainer supplies an official or otherwise approved public menu URL to the preparation workflow. The workflow retrieves supported public page, PDF, or menu-image content, or lets the maintainer provide readable source text when automatic retrieval fails. AI may identify candidate menu items, ingredients, explicit allergen statements, stated modifications, and supporting excerpts. Process the menu generally, not just for one current group, so the shared catalog can serve later searches.
+3. AI output is a draft. A maintainer checks each candidate against the cited source before publication. Reject or mark unknown any fact without clear supporting evidence. AI must not infer safety from omitted ingredients or menu silence.
+4. The maintainer publishes reviewed facts into the catalog through the chosen repository or database workflow. Record review and source-check dates so catalog changes can be traced.
+5. A failed source fetch or extraction is an operational failure, not evidence that a menu item or allergen is absent. Preserve the last approved catalog facts and flag their freshness for review.
 
-### Evidence and uncertainty
+The search-time AI receives the full group's restrictions and the relevant reviewed catalog facts. It assesses candidate suitability, chooses and ranks per-person options to maximize group coverage, explains which facts support each suggestion, and proposes modifications only when they are grounded in menu or restaurant evidence. A deterministic post-validator checks the returned schema, source IDs, known ingredient conflicts, and required warnings; it does not choose the menu items or rank them. The AI cannot browse for new dishes or replace missing catalog facts with model knowledge. Its suggestions remain uncertain where the catalog lacks relevant evidence, and must never be presented as guarantees of safety.
 
-Each stored fact must be traceable to a restaurant and menu item, source URL or submission origin, source type, supporting text or image-derived text, retrieval/last-checked time, confidence, and extraction version. Distinguish restaurant-provided statements from AI-derived interpretations and user-reported information.
+### Catalog data and evidence
 
-Represent unknown separately from an explicit statement that an ingredient or allergen is absent. Missing menu details, unsupported extraction, stale sources, or conflicting evidence must not be interpreted as safety. A menu description alone does not establish preparation or cross-contact practices.
+At minimum, represent:
 
-For downstream matching, preserve enough information to distinguish an item as listed, an item that may work with a clearly stated modification, and an uncertain item. Deterministic rules apply the group's restriction severity. They must preserve the `project_specs.md` requirements that group coverage is the highest ranking priority, uncertain items remain visible with warnings and lower rank, and room-level restrictions receive a strong warning rather than automatic exclusion.
+- **Restaurant:** stable ID, name, Utah Valley city, and available price context.
+- **Source:** stable ID, restaurant ID, URL, source type (official or third-party), source title when available, last-checked date, and source status.
+- **Menu item:** stable ID, restaurant ID, name, description, and available price/image information.
+- **Fact:** the ingredient, allergen, or preparation statement; whether it is restaurant-stated or maintainer interpretation; known/present/explicitly absent/unknown status as appropriate; confidence; and its own evidence reference.
+- **Evidence:** source ID and a short supporting text excerpt or location in the source. Keep evidence close to the fact it supports rather than only at the restaurant level.
+- **Modification:** a source-supported possible change, such as omitting an ingredient, with evidence and uncertainty retained.
 
-Never present a dish or restaurant as guaranteed allergen-free. When information is uncertain or incomplete, advise the organizer to confirm ingredients, preparation practices, and cross-contact directly with the restaurant.
+Unknown information must be distinct from an explicit restaurant statement that an ingredient or allergen is absent. Ingredient absence does not establish lack of cross-contact. A menu description alone does not prove preparation practices. Custom restrictions that cannot be mapped to known catalog concepts remain uncertain and must not be treated as matched.
 
-### Submission privacy and validation
+### AI recommendation behavior
 
-- Keep user-submitted source content private to the submitting temporary search until reviewed.
-- Delete uploaded menu images after processing. Retain extracted evidence and source metadata with the temporary preview, subject to its TBD session expiration. For review, retain extracted evidence in the pending record, not the original image.
-- Validate URLs and uploads, cap processing resources, and restrict URL fetching to public sources. Do not allow submitted URLs to reach private network or local services.
-- Define supported image formats, upload limits, URL rules, and session expiration when the chosen stack and deployment limits are known.
+1. Accept the group request defined by [`../shared/search-api-contract.md`](../shared/search-api-contract.md).
+2. Read the published restaurant/menu catalog and select the relevant records for the request. Do not fetch websites or use uncataloged model knowledge during group search.
+3. Send all group restrictions and relevant facts to a server-side AI recommendation service. The model assesses and selects candidate dishes per person, prioritizing restaurants where everyone has an option even when members choose different dishes. It may suggest a modification, such as asking for a salad without croutons; for a person who does not consider cross-contact a restriction, it may also present removing croutons as a user-chosen modification, clearly marked as not suitable as-listed and not a safety guarantee. Do not imply that removing an ingredient resolves cross-contact concerns.
+4. Apply the severity meanings in `project_specs.md`: a known conflicting ingredient does not fit as-listed for severity 2 or higher; a modification may be proposed only as a separate option. For cross-contact severity, do not treat ingredient omission as sufficient unless the catalog contains restaurant-specific preparation evidence. For room-level restrictions, preserve the strong restaurant warning rather than automatically hiding the restaurant.
+5. Return `as_listed`, `modification`, or `uncertain` for each suggested item. State whether it is likely a full meal, a side, or unclear. Explain the basis in plain language and cite the menu and allergen guide or other relevant approved source records.
+6. Prefer a suitable full meal for each person. If a restaurant has no suitable full-meal option for a person, allow a suitable side as a fallback and label it clearly as a side; do not present the side as a full meal.
+7. Every citation must resolve to a catalog source with its exact URL and source type. Link each key ingredient, allergen, preparation, or modification claim to the evidence that supports it. If no source supports a claim, omit the claim or mark it unknown; never fabricate a citation.
+8. Rank for group coverage first, so each person can have an option even when they choose different dishes. Among comparable coverage options, prioritize full meals; keep uncertain suggestions visible but below better-supported options, and preserve warnings and restaurant-confirmation guidance.
+9. Keep the AI call server-side so provider credentials never enter the browser. Validate the response against a structured schema and the catalog's source IDs before returning it. Do not treat a valid schema as proof that the recommendation is factually correct.
 
-### Service interfaces
+### Safety, privacy, and publication
 
-Keep contracts technology-neutral. The backend must provide:
-
-- Maintainer operations to add/update curated sources, inspect check status, and start an on-demand check.
-- Submission intake for a URL or image, returning a private processing identifier and status.
-- A private preview result/status read associated with the temporary search.
-- Maintainer review operations to approve or reject user-submitted candidate facts before shared publication.
-- User report intake and a maintainer follow-up queue.
-- A read-only menu-facts interface for recommendation logic, including provenance, evidence, freshness, confidence, and uncertainty.
-
-Exact routes, request schemas, authentication, and storage formats depend on the technology stack and are open decisions.
+- Catalog content is public once published. Do not place secrets, private user information, or AI credentials in browser code or public catalog files. Send only the temporary group restrictions and relevant catalog context required for the AI recommendation.
+- Do not store an organizer's group restrictions in the shared menu catalog. Keep search inputs temporary unless a later product decision adds accounts or saved profiles.
+- Follow source terms and applicable limits when retrieving and republishing public menu information.
+- Do not make “allergen-free” or equivalent guarantees. A claim can be included only as a clearly attributed restaurant statement with date and evidence, and still must not be presented as a safety guarantee.
 
 ## User flows
 
-1. **Curated source refresh:** A maintainer registers an official menu source. The weekly job fetches it, records the check, extracts candidate facts, and updates the shared catalog only through the appropriate maintainer review process. Failed fetches remain processing failures; they do not mean that a menu item or allergen is absent.
-2. **Private URL/image preview:** An organizer submits a URL or image. The backend validates it, creates a processing job, extracts candidate facts and evidence, deletes the image after processing, then returns a private preview with source, freshness, confidence, and warnings. The organizer may submit the information for internal review for possible shared use.
-3. **Report a concern:** An organizer reports incorrect or concerning information. The system records the affected fact and report context, then makes it available for internal follow-up without changing recommendation data automatically.
-4. **Downstream matching:** Recommendation logic reads sourced menu facts and applies deterministic restriction rules. Its detailed behavior is defined in a separate plan.
+1. **Prepare a catalog update:** Maintainer selects a restaurant source, retrieves its public menu, uses AI to structure candidate items and evidence, verifies each candidate, resolves unknowns/conflicts, then publishes the reviewed catalog update.
+2. **Search for a group:** Organizer enters participants and restrictions. The backend reads the published catalog, sends relevant facts and restrictions to the server-side AI recommendation service, validates its structured suggestions and citations, and returns ranked restaurants and per-person meal options with evidence and warnings.
+3. **Refresh outdated information:** Maintainer rechecks a source, compares it with the current catalog, reviews changed facts, and publishes an update. If retrieval or extraction fails, the existing approved facts remain and are marked for follow-up.
 
 ## States and edge cases
 
-Processing state should distinguish `queued`, `processing`, `completed`, `needs_review`, and `failed`. Review state should distinguish `pending`, `approved`, and `rejected`.
-
-Handle unreachable or changed pages, redirects, duplicate sources and dishes, incomplete menus, unsupported or unreadable images, missing evidence, low confidence, stale facts, contradictory sources, AI/provider errors, report submission errors, and expired private previews. Keep processing failure distinct from a successful extraction whose facts are unknown or incomplete. Preserve previous shared facts with their previous source/check timestamps when a refresh fails; mark their freshness for downstream warning rather than silently replacing them.
+Represent catalog facts as draft, reviewed, or published; distinguish source checks as successful, changed, unavailable, or failed. Handle duplicate restaurants/items, changed or unreachable pages, incomplete menus, conflicting sources, missing evidence, low-confidence extraction, unsupported custom restrictions, stale facts, and malformed catalog data. At search time also handle AI timeout or provider failure, invalid structured output, unknown source IDs, unsupported citations, contradictory evidence, and ambiguous meal-versus-side classification. Do not turn a processing failure or missing statement into an allergen absence. Preserve prior approved facts when a refresh fails; never return an uncited AI claim as a menu fact.
 
 ## Risks and mitigation
 
-- **False confidence about allergy safety:** Require evidence and confidence per fact, keep unknown explicit, and show warnings and restaurant-confirmation guidance.
-- **Stale or conflicting menus:** Track last-checked times and source precedence; expose disagreement and stale status to downstream matching.
-- **AI extraction errors:** Use AI only to propose facts, retain evidence, track extraction version, and evaluate extraction on representative menus before relying on it.
-- **Unsafe or abusive URL/image submissions:** Validate and limit inputs, isolate files, restrict fetching to public sources, and cap processing resources.
-- **Privacy or unintended sharing:** Bind previews to a temporary search, gate catalog publication on maintainer approval, and delete original images after processing.
-- **Operational backlog:** Measure source failures and review queue age; give maintainers a way to inspect failures and pending items.
+- **False confidence about allergy safety:** Preserve unknowns and conflicts, require evidence for every material recommendation claim, use severity-aware constraints, show warnings, and advise users to confirm with the restaurant. AI suggestions are not safety guarantees.
+- **AI recommendation or extraction mistakes:** Require maintainer review of catalog facts, constrain recommendation input/output to catalog evidence, validate citations, and evaluate both extraction and recommendation quality before release.
+- **Unsafe or confusing modification advice:** Distinguish ordering an item without an ingredient from removing it after serving. For cross-contact concerns, do not imply ingredient removal resolves preparation risk.
+- **AI provider outage or bad output:** Define a clear search error/degraded state; never silently convert a model failure into a claim that no suitable dishes exist.
+- **Stale or changed menus:** Record source and check dates; make refresh work repeatable and display stale or conflicting data as uncertain.
+- **Source terms or access restrictions:** Prefer public official sources, check applicable terms, and keep collection bounded and maintainer-directed.
+- **Unsafe or unreliable source retrieval:** Restrict retrieval to public web sources, validate redirects and response limits, and treat blocked or unreadable content as a failed check that needs maintainer follow-up.
+- **Unsafe custom-restriction mapping:** Use reviewed aliases/concepts for matching; leave unmatched custom needs uncertain rather than guessing.
+- **Catalog/build failure:** Validate identifiers, references, required evidence, supported fact states, and publication format before release.
 
 ## Acceptance criteria
 
-- Curated sources are checked weekly, and each stored fact can be traced to its source, evidence, confidence, extraction version, and check date.
-- Organizers can submit a URL or image and receive a private preview; user-submitted facts cannot enter shared data before internal approval.
-- Uploaded images are deleted after processing, while the extracted evidence remains available for the preview or pending review until its applicable retention period expires.
-- Unknown, incomplete, stale, and conflicting information remains distinct from an explicit allergen-free claim.
-- Reports are routed for internal follow-up and do not automatically edit, hide, or reclassify facts.
-- Downstream matching can distinguish known, unknown, and potentially modifiable information and can apply the severity, group coverage, uncertainty ranking, and room-level warning requirements from `project_specs.md`.
-- Test coverage includes extraction failure, stale and conflicting sources, unsupported images, private-preview isolation, publication review gating, image deletion, and report handling.
+- Maintainers can create reviewed catalog entries for Utah Valley restaurants from public menu sources.
+- AI-assisted candidates include evidence references and confidence, and cannot be published until a maintainer verifies them.
+- Search uses the published catalog and a server-side AI recommendation call; it does not fetch menu websites or use uncataloged web results at runtime.
+- Each recommendation includes a plain-language reason, an explicit as-listed/modification/uncertain status, a full-meal/side/unclear label, and links to the menu and allergen-guide sources that support its claims.
+- AI cannot cite source IDs absent from the catalog; unsupported statements are omitted or marked unknown.
+- Each relevant menu fact exposes its source, last-checked date, evidence, confidence, and uncertainty to the result layer.
+- Unknown, explicit absence, and processing failure remain distinct; missing evidence never becomes a safety claim.
+- Recommendations respect severity, group coverage, uncertain ranking, and room-warning rules from `project_specs.md`; an ingredient omission alone does not resolve cross-contact concerns.
+- Invalid catalog records and duplicate IDs/references are caught before publication.
+- The interface returns the full/partial/none outcomes and source/warning fields described in the shared search contract.
 
 ## Dependencies and decisions
 
-- The backend stack and corresponding database, queue, hosting, AI provider, and maintainer authentication are intentionally open.
-- Internal maintainers own the curated URL list and review submissions before they enter shared data.
-- Curated source refresh cadence is weekly; maintainers may trigger a check on demand.
-- User submissions may be used for private previews before review. Shared publication requires internal approval.
-- Uploaded images are deleted after processing; extracted evidence and metadata are retained with the temporary preview or pending review record until an expiration policy is defined.
-- The exact temporary-session lifetime, image format/size limits, URL rules, evidence schema, and stale-data thresholds need to be set alongside the selected stack and deployment constraints.
-- The next backend feature plan should cover deterministic recommendation matching and ranking. The project spec also lists restaurant allergy-care ratings as a later feature; keep those separate from evidence extraction and user reports.
+- `project_specs.md` defines Utah Valley coverage, group severity, group-coverage priority, result warnings, and restaurant-confirmation guidance.
+- The current work board records Next.js + Supabase as selected. Runtime AI requires a trusted server-side search endpoint. Confirm the deployment target and catalog storage with Eliza; a GitHub Pages-only site cannot protect provider credentials or host `/api/search`, so this runtime-AI decision supersedes the earlier static-only deployment assumption unless a separate secure backend is deployed.
+- Confirm the canonical source, fact, evidence, and modification schema before implementation.
+- Confirm the common restriction keys and how approved aliases map to catalog facts. Unmapped custom restrictions remain uncertain.
+- Confirm who can publish catalog changes and how reviews are recorded.
+- Source refresh is manual/as-needed for v1; automated cadence, crawling, and scheduled extraction are deferred.
+- User submissions and reports remain out of scope for v1. Runtime AI recommendations are now in scope and require a server-side model integration.
 
 ## Measurements and operations
 
-Track source-check success/failure and freshness, extraction success/failure and confidence distribution, unsupported/low-evidence results, review queue volume and age, user report volume, and processing latency. Maintainers must be able to identify failed checks and pending reviews. A failed fetch or extraction must never be surfaced as evidence that an item lacks allergens.
+Track restaurant/menu coverage across Utah Valley; percentage of facts with evidence and current check dates; unknown, stale, and conflicting facts; AI extraction acceptance/correction rates; recommendation citation completeness and correction reports from internal evaluation; model latency/failures; catalog validation failures; and search errors. Maintainers review the catalog as part of each update. A failed fetch, extraction, or recommendation call must never appear to users as evidence that no suitable food exists or that an item lacks allergens.
 
 ## Future implementations
 
-- Restaurant staff source management.
-- Persistent dietary profiles and saved searches.
-- Broader automated source discovery and enhanced menu parsing.
-- Restaurant allergy-care ratings as specified in `project_specs.md`.
+- Scheduled source checks and AI-assisted change proposals with human review.
+- Expanded restaurant source discovery and richer menu parsing.
+- User correction/report workflows with moderation, if added to scope.
+- Persistent dietary profiles or saved searches, if added to scope.
+- Broader runtime web research only if separately evaluated and designed with traceable source capture.
+- A user control for full-meal-only recommendations versus allowing side fallbacks. Decide whether it applies per person or to the whole group before adding the preference to the search request.
 
 ## Future work
 
-- Select the backend stack and define its data, job, and service contracts.
-- Set temporary-session retention, image limits/formats, URL validation rules, and stale-data thresholds.
-- Build an extraction evaluation set with representative official menus, third-party sources, and menu images.
-- Create the separate recommendation-service plan for group coverage, restriction severity, modifications, uncertainty, and ranking.
+- Confirm secure server-side deployment and catalog storage with Eliza; resolve the earlier GitHub Pages-only assumption against the new runtime-AI requirement.
+- Agree on the source/fact/evidence/modification schema and restriction alias map.
+- Define the maintainer's repeatable AI-assisted collection, verification, and publication checklist.
+- Create a small representative Utah Valley seed catalog and extraction evaluation set.
+- Define stale-data thresholds and catalog validation rules before implementation.
+- Select a model/provider and define server-side privacy, cost, latency, failure, and structured-output behavior for recommendations.
+- Implement and evaluate the evidence-constrained AI recommendation behavior described in the shared API contract.
 
 ## Edit history
 
 | Date and time | Change |
 | --- | --- |
 | 2026-11-16 23:28 America/Denver | Created the initial menu data and evidence pipeline plan. |
+| 2026-11-18 14:48 America/Denver | Reframed v1 as a reviewed catalog with AI-assisted preparation and deterministic group matching. |
+| 2026-11-18 15:02 America/Denver | Changed group item selection to evidence-constrained AI recommendations with modifications, meal-role labels, and source links. |
+| 2026-11-18 15:03 America/Denver | Clarified that AI selects menu items while deterministic post-validation checks only hard constraints and citations. |
+| 2026-11-18 15:10 America/Denver | Prioritized full meals and defined clearly labeled side fallbacks; deferred user meal-preference control. |
