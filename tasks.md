@@ -133,6 +133,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [x] Record Next.js + Supabase as the selected stack.
 - [ ] Record the Next.js deployment target and shared development environment.
 - [ ] Review and confirm the proposed group-search API contract with Mary: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md).
+- [ ] Review deployment and search architecture options with Mary: [`documents/shared/deployment-options.md`](documents/shared/deployment-options.md).
 - [ ] Record the app structure and local development workflow.
 - [ ] Decide how maintainers review and publish menu catalog changes and when facts are considered stale.
 - [ ] Confirm user menu submissions and reports remain out of scope for v1.
@@ -155,6 +156,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - Product requirements: [`project_specs.md`](project_specs.md)
 - Backend menu data plan: [`documents/back-end/menu-data-and-evidence-pipeline.md`](documents/back-end/menu-data-and-evidence-pipeline.md)
 - Proposed group search API contract: [`documents/shared/search-api-contract.md`](documents/shared/search-api-contract.md)
+- Deployment and search architecture options: [`documents/shared/deployment-options.md`](documents/shared/deployment-options.md)
 
 ## Change history
 
@@ -163,4 +165,5 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 | 2026-11-18 14:48 America/Denver | Replaced v1 upload/report ingestion tasks with AI-assisted catalog preparation and deterministic group search. |
 | 2026-11-18 15:02 America/Denver | Added server-side AI selection, modification, meal-role, and source-citation tasks. |
 | 2026-11-18 15:03 America/Denver | Clarified that AI owns menu selection and ranking; deterministic checks validate citations and hard constraints. |
+| 2026-11-18 15:21 America/Denver | Added deployment and search architecture options for joint review. |
 | 2026-11-18 15:10 America/Denver | Recorded full-meal-first recommendations, labeled side fallback, and future user preference control. |
