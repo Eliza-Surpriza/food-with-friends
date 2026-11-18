@@ -152,6 +152,19 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Decide temporary-session expiration, supported image types/size limits, and stale-data thresholds.
 - [ ] Decide how internal maintainers access the source list and review/report queues.
 
+## First end-to-end integration
+
+- [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
+- [ ] **Mary + Eliza:** Define the search request: people, unique nicknames, restriction types or custom needs, and severity levels.
+- [ ] **Mary + Eliza:** Define the search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, sources, last-checked dates, confidence, and warnings.
+- [ ] **Mary - Backend:** Provide an initial restaurant-search/recommendation endpoint using curated or seed menu data, including full matches, partial matches, and no-match results.
+- [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
+- [ ] **Eliza - Frontend:** Build the API connection and replace the wireframe's sample result data with backend responses.
+- [ ] **Eliza - Frontend:** Connect loading, processing, error, full-match, partial-match, and no-match states to the agreed API behavior.
+- [ ] **Mary + Eliza:** Run both apps together locally and resolve API URL, CORS, and configuration issues.
+- [ ] **Mary + Eliza:** Walk through group entry → search → restaurant details → meal details using representative full, partial, and empty results; fix issues found.
+- [ ] **Mary + Eliza:** Deploy a shared development version and confirm the frontend can reach the backend there.
+
 ## Project references
 
 - Product requirements: [`project_specs.md`](project_specs.md)
