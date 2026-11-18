@@ -77,16 +77,74 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 ### Current focus
 
-- Add what you are working on here.
+- [ ] Agree with Mary on the frontend foundation, first screen flow, and API/data contract for group searches and restaurant results.
 
 ### Task list
 
-- Add frontend tasks here and link backend dependencies or API questions that need coordination.
+#### 1. Define the frontend foundation and contract
+
+- [ ] Review the repository setup with Mary and choose the frontend framework, build tooling, styling approach, and local development workflow.
+- [x] Create a low-fidelity clickable prototype of the mobile-first group setup flow in [`wireframe.html`](wireframe.html): welcome, person details, need selection, group review, and results entry point.
+- [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
+- [ ] Agree with Mary on the request/response data needed for participants, restrictions and severity, per-person menu matches, modifications, source evidence, warnings, restaurant city, and prices.
+- [ ] Agree on how the frontend receives processing progress, incomplete results, and API errors, including what to show while menu data is being processed.
+- [ ] Confirm temporary-search behavior with the backend, including what data can remain in browser state and when it should be cleared.
+
+#### 2. Build the app shell
+
+- [ ] Create the frontend project structure, app entry point, shared layout, and navigation for the search flow.
+- [ ] Make the layout work well on mobile first, then adapt it for wider screens.
+- [ ] Add shared form controls, buttons, alerts, loading indicators, and accessible typography/color styles.
+
+#### 3. Build group and dietary-needs entry
+
+- [ ] Require a unique name or nickname when adding each person; use it to identify that person's menu suggestions in results.
+- [ ] Let the organizer remove people from the group.
+- [ ] Let the organizer add multiple specific needs per person from the main options list and enter a custom restriction.
+- [ ] Add selected needs one at a time at the default severity, returning to the person's details after each selection.
+- [ ] Allow a person to be saved with no dietary needs after entering a nickname.
+- [ ] Default each new need, including custom needs, to “I won't eat this”; let the organizer tap its severity indicator to open a picker explaining all four severity choices.
+- [ ] On the group screen, summarize each person's dietary needs with green/yellow/orange/red severity markers and accessible severity labels; let the organizer add another friend through the same flow and tap a person's name to review or edit their details.
+- [ ] On a person's details screen, let the organizer remove an individual need using an **X** next to it, with a confirmation prompt that names the need (for example, “Remove peanuts?”).
+- [ ] Confirm person removal with a prompt that includes the person's nickname before deleting them from the group.
+- [ ] Let the organizer review and edit the full group before searching.
+- [ ] Add clear validation for missing or duplicate person names, empty groups, and incomplete custom restriction entries.
+
+#### 4. Build restaurant search and ranked results
+
+- [ ] Submit the group needs to the agreed backend interface without requesting the user's location; search the Utah Valley restaurant set.
+- [ ] Show a ranked restaurant list, prioritizing restaurants where every person has at least one suitable item. Do not require everyone to choose the same dish.
+- [ ] Show each restaurant's city and the most specific price information available.
+- [ ] For each restaurant, show the suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
+- [ ] Show the source link, last-checked date, confidence label, and relevant ingredient or cross-contamination warnings for each menu item.
+- [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
+- [ ] Show a strong warning for room-level restrictions while allowing the user to decide whether to consider that restaurant.
+- [ ] Tell users to confirm uncertain ingredients and preparation practices with the restaurant; never label a dish as guaranteed allergen-free.
+
+#### 5. Handle search and result states
+
+- [ ] Design loading and processing states, including a clear indication when results are not ready yet.
+- [ ] Design useful empty states for no restaurants, no suitable items for a person, and incomplete menu information.
+- [ ] Handle backend/network errors and stale or missing source details without presenting unknown information as safe.
+- [ ] Let the organizer edit group needs and search again without rebuilding the group from scratch.
+
+#### 6. Integrate and polish
+
+- [ ] Connect the screens to the API contract agreed with Mary; use clearly labeled sample data only while the backend interface is unavailable.
+- [ ] Check keyboard navigation, screen-reader labels, focus handling, readable warning hierarchy, and layouts at mobile and desktop widths.
+- [ ] Walk through the complete group-entry-to-results flow with representative group needs and menu results; record and fix issues before release.
+
+#### Later frontend features
+
+- [ ] Add cuisine and price filters after the core matching flow is working.
+- [ ] Consider a map view alongside the ranked list.
+- [ ] Consider saving dietary profiles for reuse; persistent profiles are not part of the first version.
 
 ## Shared decisions and blockers
 
 - [ ] Record the selected backend stack and deployment target.
 - [ ] Record agreed API contracts and any frontend/backend dependencies.
+- [ ] Record the selected frontend stack, app structure, and local development workflow.
 - [ ] Decide temporary-session expiration, supported image types/size limits, and stale-data thresholds.
 - [ ] Decide how internal maintainers access the source list and review/report queues.
 

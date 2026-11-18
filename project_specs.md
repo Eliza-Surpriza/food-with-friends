@@ -7,10 +7,26 @@ Food with Friends is a mobile-forward web app that helps a group choose restaura
 ## Group and dietary needs
 
 - One organizer enters the dietary needs for the whole group.
-- The organizer can add a name or nickname for each person. Names help identify who each recommendation is for.
+- The organizer must enter a name or nickname for each person. Results use it to identify who each suggested meal is for.
+- Names or nicknames must be unique within the group.
 - Each person can have multiple dietary needs. The app should offer common options and let the organizer add a custom restriction when needed.
-- Broad options can expand into more specific choices. For example, “nuts” can expand to peanuts and tree nuts, and “seafood” can expand to shellfish and finfish.
-- Suggested common options include vegetarian, vegan, gluten-free, dairy-free, nuts, shellfish, eggs, soy, sesame, wheat, and finfish. The list can be refined as needed.
+- Show specific restriction choices directly in the main list; do not require selecting a broad category and then expanding it.
+- Suggested common options include vegetarian, vegan, gluten-free, dairy-free, peanuts, tree nuts, shellfish, finfish, eggs, soy, sesame, and wheat. The list can be refined as needed.
+
+### Group setup flow
+
+- After the welcome screen, go directly to entering the first person's nickname and dietary needs; do not show a separate “Who are you eating with today?” step.
+- Require a unique nickname before saving a person, including when they have no dietary needs.
+- Each person's details screen lets the organizer add dietary needs. Choosing **Custom** opens text entry for a custom need.
+- Add one need at a time: selecting a specific option adds that need at the default severity and returns to the person's details screen. The organizer can use **+** again to add another.
+- A person may have no dietary needs. The organizer can enter a nickname and save immediately without adding a need; an empty needs list is valid.
+- New needs use the default severity, **“I won't eat this.”** The organizer can change severity from the person's details screen by tapping that need's severity indicator. The picker explains all four severity levels.
+- A checkmark saves the person's details and returns to the group screen.
+- The group screen shows each person's name plus a summary of their dietary needs and severity indicators. It lets the organizer add another friend using the same nickname-and-needs flow. Tapping a person's name opens their details so the organizer can review or edit them.
+- Show a color marker for each need in the group summary: green for “I'd rather not have it,” yellow for “I won't eat this” (default), orange for “I can't eat anything that touches this,” and red for “I can't be in a room with this.” Provide an accessible severity label as well, so meaning does not rely on color alone.
+- On a person's details screen, each dietary need has its own **X**; tapping it asks for confirmation and names the specific need, for example, “Remove peanuts?”
+- Tapping a person's **X** asks for confirmation and names the person, for example: “Are you sure you want to remove [nickname]?”
+- The search icon on the group screen opens restaurant results.
 
 Use this severity scale for each restriction:
 

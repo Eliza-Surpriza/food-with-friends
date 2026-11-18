@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f5f1">
+  <title>Food with Friends · Group setup wireframe</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #252b29;
+      --muted: #69736e;
+      --line: #dce1dc;
+      --paper: #fff;
+      --canvas: #f4f5f1;
+      --green: #246b4b;
+      --green-soft: #e8f3ec;
+      --focus: #155f8c;
+      --red: #a52f29;
+      --yellow: #ebc743;
+      --orange: #dc7938;
+      --radius: 20px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .app { min-height: 100svh; display: flex; justify-content: center; padding: 20px; }
+    .device { width: min(100%, 460px); min-height: min(880px, calc(100svh - 40px)); display: flex; flex-direction: column; overflow: hidden; background: var(--paper); border: 1px solid #e5e8e4; border-radius: 28px; box-shadow: 0 18px 55px #25312b12; }
+    .topbar { min-height: 66px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #edf0ec; }
+    .brand { display: inline-flex; gap: 9px; align-items: center; font-weight: 750; letter-spacing: -.03em; }
+    .brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--green); font-size: 15px; }
+    main { display: flex; flex: 1; flex-direction: column; padding: 24px 22px 20px; }
+    .content { flex: 1; }
+    .eyebrow { margin: 2px 0 8px; color: var(--green); font-size: 12px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(25px, 7vw, 32px); line-height: 1.13; letter-spacing: -.045em; }
+    h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+    .lead { margin: 12px 0 22px; color: var(--muted); line-height: 1.55; }
+    .small { font-size: 13px; line-height: 1.45; color: var(--muted); }
+    .field-label { display: block; margin: 24px 0 8px; font-size: 13px; font-weight: 700; }
+    input[type="text"] { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid #cbd3cd; border-radius: 12px; color: var(--ink); background: white; }
+    input::placeholder { color: #909a94; }
+    .error { min-height: 20px; margin: 7px 0 0; color: var(--red); font-size: 13px; }
+    .need-list { display: grid; gap: 10px; margin: 20px 0; }
+    .need-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 9px; align-items: center; padding: 11px 11px 11px 13px; border: 1px solid var(--line); border-radius: 13px; }
+    .need-name { font-weight: 650; }
+    .severity-button { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 6px 9px; border: 1px solid transparent; border-radius: 9px; color: var(--ink); background: #f6f7f4; text-align: left; font-size: 12px; }
+    .severity-button:hover { border-color: #c9d2cb; }
+    .severity-marker { display: inline-block; width: 20px; height: 20px; flex: 0 0 20px; vertical-align: middle; }
+    .severity-marker path { stroke: #0002; stroke-width: .7; }
+    .severity-marker text { fill: #fff; font-family: system-ui, sans-serif; font-size: 12px; font-weight: 850; text-anchor: middle; }
+    .marker-1 path { fill: #378b5e; }
+    .marker-2 path { fill: var(--yellow); }
+    .marker-3 path { fill: var(--orange); }
+    .marker-4 path { fill: #d34a41; }
+    .marker-2 text, .marker-3 text { fill: #352b18; }
+    .icon-button { width: 32px; height: 32px; display: inline-grid; place-items: center; border: 1px solid transparent; border-radius: 10px; color: #54615a; background: transparent; font-size: 19px; }
+    .icon-button:hover { color: var(--red); background: #fff1f0; }
+    .add-row { width: 100%; display: flex; align-items: center; gap: 11px; padding: 14px; border: 1px dashed #9eaaa1; border-radius: 14px; color: var(--green); background: #fbfcfa; font-weight: 700; text-align: left; }
+    .add-circle { width: 29px; height: 29px; display: grid; place-items: center; border: 1px solid #a9c5b3; border-radius: 50%; font-size: 20px; line-height: 1; }
+    .empty-note { margin: 20px 0; padding: 15px; border-radius: 13px; color: var(--muted); background: #f6f7f4; font-size: 14px; line-height: 1.5; }
+    .actions { display: flex; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #edf0ec; }
+    .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 1px solid transparent; border-radius: 12px; font-weight: 700; }
+    .button-primary { color: white; background: var(--green); }
+    .button-primary:hover { background: #1d593e; }
+    .button-secondary { color: var(--ink); background: white; border-color: var(--line); }
+    .button-secondary:hover { background: #f7f8f5; }
+    .button-quiet { color: var(--muted); background: transparent; }
+    .button-full { width: 100%; }
+    .button-search { min-width: 54px; padding: 0; font-size: 21px; }
+    .welcome { display: flex; flex: 1; flex-direction: column; justify-content: center; padding: 10px 0 36px; }
+    .welcome-art { width: 108px; height: 108px; display: grid; place-items: center; margin-bottom: 25px; border-radius: 34px; color: #255b40; background: var(--green-soft); font-size: 46px; transform: rotate(-5deg); }
+    .welcome .lead { max-width: 340px; margin-bottom: 25px; }
+    .progress { display: flex; align-items: center; gap: 7px; margin: 0 0 23px; }
+    .progress span { height: 5px; flex: 1; border-radius: 5px; background: #e6eae5; }
+    .progress span.active { background: #39805b; }
+    .option-list { display: grid; gap: 9px; margin: 20px 0; }
+    .option { width: 100%; min-height: 49px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: white; text-align: left; font-weight: 650; }
+    .option:hover { border-color: #78a88a; background: #f8fbf8; }
+    .option small { color: var(--muted); font-weight: 500; }
+    .custom-box { margin-top: 13px; padding: 15px; border: 1px solid #dce3dc; border-radius: 14px; background: #fafbf9; }
+    .custom-box .field-label { margin-top: 0; }
+    .section-row { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 24px 0 12px; }
+    .person-card { margin: 8px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: white; }
+    .person-top { display: flex; align-items: center; gap: 4px; padding: 3px 5px 0 0; }
+    .person-heading { width: 100%; flex: 1; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 11px; border: 0; color: var(--ink); background: white; text-align: left; }
+    .person-heading:hover { background: #fafbf9; }
+    .person-name { font-size: 15px; font-weight: 750; }
+    .chevron { color: var(--muted); font-size: 19px; }
+    .summary-needs { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 11px 9px; }
+    .summary-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 4px 7px; border: 1px solid #e4e8e3; border-radius: 999px; background: #fbfcfa; font-size: 11px; }
+    .summary-empty { padding: 0 15px 15px; color: var(--muted); font-size: 13px; }
+    .group-foot { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+    .group-foot .button-primary { flex: 1; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 18px; padding: 4px 0; border: 0; color: var(--muted); background: transparent; font-weight: 650; }
+    .back-link:hover { color: var(--ink); }
+    .severity-options { display: grid; gap: 10px; margin: 21px 0; }
+    .severity-option { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 13px; border: 1px solid var(--line); border-radius: 13px; color: var(--ink); background: white; text-align: left; }
+    .severity-option:hover { border-color: #78a88a; background: #f9fbf9; }
+    .severity-option .severity-marker { margin-top: 1px; }
+    .severity-title { display: block; margin-bottom: 4px; font-weight: 750; }
+    .severity-description { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .dialog-backdrop { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; background: #1d292280; }
+    .dialog { width: min(100%, 390px); padding: 23px; border-radius: 19px; background: white; box-shadow: 0 20px 60px #0003; }
+    .dialog h2 { margin-bottom: 9px; }
+    .dialog p { color: var(--muted); line-height: 1.5; }
+    .dialog-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .dialog-actions .button { flex: 1; }
+    .button-danger { color: white; background: var(--red); }
+    .button-danger:hover { background: #85241f; }
+    .results-placeholder { margin-top: 24px; padding: 18px; border: 1px dashed #aab5ad; border-radius: 16px; background: #fafbf9; }
+    .result-skeleton { height: 14px; margin: 12px 0; border-radius: 7px; background: #e9ede8; }
+    .result-skeleton.short { width: 56%; }
+    .demo-tag { display: inline-block; margin-top: 16px; padding: 6px 9px; border-radius: 999px; color: #516258; background: #eef2ed; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    @media (max-width: 560px) {
+      .app { min-height: 100svh; padding: 0; background: white; }
+      .device { width: 100%; min-height: 100svh; border: 0; border-radius: 0; box-shadow: none; }
+      main { padding: 22px 18px max(18px, env(safe-area-inset-bottom)); }
+      .topbar { padding-inline: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="device" id="app" aria-live="polite"></div>
+  </div>
+  <script>
+    const restrictions = [
+      "Vegetarian", "Vegan", "Gluten-free", "Dairy-free", "Peanuts", "Tree nuts",
+      "Shellfish", "Finfish", "Eggs", "Soy", "Sesame", "Wheat"
+    ];
+    const severities = [
+      { id: 1, title: "I'd rather not have it", description: "I might be open to suggestions that include it as an ingredient." },
+      { id: 2, title: "I won't eat this", description: "Default choice." },
+      { id: 3, title: "I can't eat anything that touches this", description: "Cross-contamination is a concern." },
+      { id: 4, title: "I can't be in a room with this", description: "Most severe; potentially life-threatening." }
+    ];
+    const state = {
+      view: "welcome",
+      people: [],
+      draft: null,
+      editingIndex: null,
+      error: "",
+      customOpen: false,
+      customError: "",
+      customValue: "",
+      activeNeedId: null,
+      pendingRemoval: null,
+      pendingExit: false
+    };
+    const app = document.getElementById("app");
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+    }
+    function severity(id) { return severities.find(item => item.id === Number(id)) || severities[1]; }
+    function severityMarker(level) {
+      return `<svg class="severity-marker marker-${level.id}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M10.25 4.8c.78-1.35 2.72-1.35 3.5 0l7.1 12.3c.78 1.35-.19 3.05-1.75 3.05H4.9c-1.56 0-2.53-1.7-1.75-3.05z"></path>
+        <text x="12" y="17">!</text>
+      </svg>`;
+    }
+    function header() {
+      return `<header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">f</span>Food with Friends</div></header>`;
+    }
+    function shell(note, content) {
+      app.innerHTML = `${header(note)}<main>${content}</main>`;
+    }
+    function render() {
+      if (state.view === "welcome") return renderWelcome();
+      if (state.view === "person") return renderPerson();
+      if (state.view === "need-picker") return renderNeedPicker();
+      if (state.view === "severity-picker") return renderSeverityPicker();
+      if (state.view === "group") return renderGroup();
+      if (state.view === "results") return renderResults();
+    }
+    function renderWelcome() {
+      shell("", `<section class="welcome">
+        <h1>Welcome</h1>
+        <button class="button button-primary button-full" data-action="start">Get started</button>
+      </section>`);
+    }
+    function renderPerson() {
+      const draft = state.draft || { name: "", needs: [] };
+      const isEdit = state.editingIndex !== null;
+      const needsMarkup = draft.needs.length
+        ? `<div class="need-list">${draft.needs.map(need => {
+            const level = severity(need.severity);
+            return `<div class="need-row">
+              <span class="need-name">${escapeHtml(need.name)}</span>
+              <button class="severity-button" data-action="edit-severity" data-id="${need.id}" aria-label="Change severity for ${escapeHtml(need.name)}. Current severity: ${escapeHtml(level.title)}">${severityMarker(level)}</button>
+              <button class="icon-button" data-action="ask-remove-need" data-id="${need.id}" aria-label="Remove ${escapeHtml(need.name)}">×</button>
+            </div>`;
+          }).join("")}</div>`
+        : "";
+      const dialog = removalDialog();
+      shell(isEdit ? "Edit person" : "Add a person", `${dialog}${exitDialog()}
+        <section class="content">
+          ${isEdit || state.people.length ? `<button class="back-link" data-action="person-back" aria-label="Back to group"><span aria-hidden="true">←</span></button>` : ""}
+          <label class="field-label" for="person-name">Nickname <span aria-hidden="true">*</span></label>
+          <input id="person-name" name="name" type="text" maxlength="32" autocomplete="off" value="${escapeHtml(draft.name)}" aria-describedby="name-error" required>
+          <div class="error" id="name-error" role="alert">${escapeHtml(state.error)}</div>
+          <div class="section-row"><h2>Dietary needs</h2></div>
+          ${needsMarkup}
+          <button class="add-row" data-action="open-need-picker" aria-label="Add a dietary need"><span class="add-circle" aria-hidden="true">+</span></button>
+        </section>
+        <footer class="actions"><button class="button button-primary button-full" data-action="save-person" aria-label="Save person and return to group">✓</button></footer>`);
+    }
+    function renderNeedPicker() {
+      shell("", `<section class="content">
+        <button class="back-link" data-action="back-to-person" aria-label="Back to person details"><span aria-hidden="true">←</span></button>
+        <h1>Add a dietary need</h1>
+        <div class="option-list">${restrictions.map(name => {
+          const exists = state.draft.needs.some(need => need.name.toLowerCase() === name.toLowerCase());
+          return `<button class="option" data-action="select-need" data-name="${escapeHtml(name)}" ${exists ? "disabled aria-disabled=\"true\"" : ""}><span>${escapeHtml(name)}</span><span aria-hidden="true">${exists ? "✓" : "+"}</span></button>`;
+        }).join("")}</div>
+        <button class="option" data-action="toggle-custom"><span>Custom</span><span aria-hidden="true">${state.customOpen ? "−" : "+"}</span></button>
+        ${state.customOpen ? `<form id="custom-form" class="custom-box" novalidate>
+          <label class="field-label" for="custom-name">Custom need</label>
+          <input id="custom-name" name="customName" type="text" maxlength="60" autocomplete="off" value="${escapeHtml(state.customValue)}" aria-describedby="custom-error">
+          <div class="error" id="custom-error" role="alert">${escapeHtml(state.customError)}</div>
+          <button class="button button-primary button-full" type="submit" aria-label="Add custom need">✓</button>
+        </form>` : ""}
+      </section>`);
+    }
+    function renderSeverityPicker() {
+      const need = state.draft.needs.find(item => item.id === state.activeNeedId);
+      if (!need) { state.view = "person"; return render(); }
+      shell("", `<section class="content">
+        <button class="back-link" data-action="back-to-person" aria-label="Back to person details"><span aria-hidden="true">←</span></button>
+        <h1>${escapeHtml(need.name)} severity</h1>
+        <div class="severity-options">${severities.map(level => `<button class="severity-option" data-action="choose-severity" data-severity="${level.id}" aria-pressed="${Number(need.severity) === level.id}">
+          ${severityMarker(level)}<span><span class="severity-title">${escapeHtml(level.title)}${level.id === 2 ? " · Default" : ""}</span><span class="severity-description">${escapeHtml(level.description)}</span></span>
+        </button>`).join("")}</div>
+      </section>`);
+    }
+    function renderGroup() {
+      const peopleMarkup = state.people.map((person, index) => {
+        const summary = person.needs.length
+          ? `<div class="summary-needs">${person.needs.map(need => {
+              const level = severity(need.severity);
+              return `<span class="summary-chip"><span role="img" aria-label="${escapeHtml(level.title)}">${severityMarker(level)}</span>${escapeHtml(need.name)}</span>`;
+            }).join("")}</div>`
+          : "";
+        return `<article class="person-card">
+          <div class="person-top"><button class="person-heading" data-action="edit-person" data-index="${index}" aria-label="Review or edit ${escapeHtml(person.name)}">
+            <span class="person-name">${escapeHtml(person.name)}</span><span class="chevron" aria-hidden="true">›</span>
+          </button>
+          <button class="icon-button" data-action="ask-remove-person" data-index="${index}" aria-label="Remove ${escapeHtml(person.name)}">×</button></div>
+          ${summary}
+        </article>`;
+      }).join("");
+      shell("", `${removalDialog()}
+        <section class="content">
+          <div class="section-row"><h1>My group</h1></div>
+          ${peopleMarkup}
+          <button class="add-row" data-action="add-person" aria-label="Add a friend"><span class="add-circle" aria-hidden="true">+</span></button>
+        </section>
+        <footer class="group-foot"><button class="button button-primary button-search" data-action="search" aria-label="Search restaurants" title="Search restaurants" ${state.people.length ? "" : "disabled"}>⌕</button></footer>`);
+    }
+    function renderResults() {
+      shell("", `<section class="content">
+        <button class="back-link" data-action="back-to-group" aria-label="Back to group"><span aria-hidden="true">←</span></button>
+        <h1>Restaurant results</h1>
+      </section>`);
+    }
+    function removalDialog() {
+      if (!state.pendingRemoval) return "";
+      const { type, index, id } = state.pendingRemoval;
+      let label = "this item";
+      if (type === "need") {
+        const need = state.draft?.needs.find(item => item.id === id);
+        label = need?.name || label;
+      } else {
+        label = state.people[index]?.name || "this person";
+      }
+      const title = type === "need" ? `Remove ${label}?` : `Are you sure you want to remove “${label}”?`;
+      return `<div class="dialog-backdrop" role="presentation"><section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title">
+        <h2 id="dialog-title">${escapeHtml(title)}</h2>
+        <div class="dialog-actions"><button class="button button-secondary" data-action="cancel-remove">Cancel</button><button class="button button-danger" data-action="confirm-remove">Remove</button></div>
+      </section></div>`;
+    }
+    function exitDialog() {
+      if (!state.pendingExit) return "";
+      return `<div class="dialog-backdrop" role="presentation"><section class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="exit-dialog-title">
+        <h2 id="exit-dialog-title">Are you sure you want to exit without saving changes?</h2>
+        <div class="dialog-actions"><button class="button button-secondary" data-action="stay-on-person">Stay</button><button class="button button-danger" data-action="confirm-exit">Exit</button></div>
+      </section></div>`;
+    }
+    function beginNewPerson() {
+      state.draft = { name: "", needs: [] };
+      state.editingIndex = null;
+      state.error = "";
+      state.customOpen = false;
+      state.view = "person";
+      render();
+      setTimeout(() => document.getElementById("person-name")?.focus(), 0);
+    }
+    function openEditPerson(index) {
+      const person = state.people[index];
+      state.draft = { name: person.name, needs: person.needs.map(need => ({ ...need })) };
+      state.editingIndex = index;
+      state.error = "";
+      state.customOpen = false;
+      state.view = "person";
+      render();
+      setTimeout(() => document.getElementById("person-name")?.focus(), 0);
+    }
+    function savePerson() {
+      const input = document.getElementById("person-name");
+      const name = (input?.value || "").trim();
+      state.draft.name = name;
+      if (!name) { state.error = "Please enter a name or nickname."; render(); document.getElementById("person-name")?.focus(); return; }
+      const duplicate = state.people.some((person, index) => index !== state.editingIndex && person.name.toLocaleLowerCase() === name.toLocaleLowerCase());
+      if (duplicate) { state.error = "That name is already used in this group. Choose a unique name or nickname."; render(); document.getElementById("person-name")?.focus(); return; }
+      const person = { name, needs: state.draft.needs.map(need => ({ ...need })) };
+      if (state.editingIndex === null) state.people.push(person);
+      else state.people[state.editingIndex] = person;
+      state.draft = null;
+      state.editingIndex = null;
+      state.error = "";
+      state.view = "group";
+      render();
+    }
+    function addNeed(name) {
+      const cleanName = name.trim();
+      if (!cleanName) return;
+      const duplicate = state.draft.needs.some(need => need.name.toLocaleLowerCase() === cleanName.toLocaleLowerCase());
+      if (duplicate) {
+        state.customError = "This need is already on the list.";
+        state.customOpen = true;
+        state.view = "need-picker";
+        render();
+        return;
+      }
+      state.draft.needs.push({ id: `need-${Date.now()}-${Math.random()}`, name: cleanName, severity: 2 });
+      state.customOpen = false;
+      state.customError = "";
+      state.customValue = "";
+      state.view = "person";
+      render();
+    }
+    function performRemoval() {
+      if (!state.pendingRemoval) return;
+      const { type, index, id } = state.pendingRemoval;
+      if (type === "need") {
+        state.draft.needs = state.draft.needs.filter(need => need.id !== id);
+      } else {
+        state.people.splice(index, 1);
+      }
+      state.pendingRemoval = null;
+      render();
+    }
+
+    app.addEventListener("click", event => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      if (action === "start") { beginNewPerson(); return; }
+      if (action === "save-person") { savePerson(); return; }
+      if (action === "open-need-picker") { state.view = "need-picker"; state.customOpen = false; state.customError = ""; render(); return; }
+      if (action === "back-to-person") { state.view = "person"; state.customOpen = false; render(); return; }
+      if (action === "select-need") { addNeed(button.dataset.name); return; }
+      if (action === "toggle-custom") { state.customOpen = !state.customOpen; state.customError = ""; state.customValue = ""; render(); if (state.customOpen) setTimeout(() => document.getElementById("custom-name")?.focus(), 0); return; }
+      if (action === "edit-severity") { state.activeNeedId = button.dataset.id; state.view = "severity-picker"; render(); return; }
+      if (action === "choose-severity") {
+        const need = state.draft.needs.find(item => item.id === state.activeNeedId);
+        if (need) need.severity = Number(button.dataset.severity);
+        state.activeNeedId = null; state.view = "person"; render(); return;
+      }
+      if (action === "ask-remove-need") { state.pendingRemoval = { type: "need", id: button.dataset.id }; render(); return; }
+      if (action === "ask-remove-person") { state.pendingRemoval = { type: "person", index: Number(button.dataset.index) }; render(); return; }
+      if (action === "cancel-remove") { state.pendingRemoval = null; render(); return; }
+      if (action === "confirm-remove") { performRemoval(); return; }
+      if (action === "stay-on-person") { state.pendingExit = false; render(); return; }
+      if (action === "confirm-exit") {
+        state.pendingExit = false;
+        state.view = "group";
+        state.draft = null;
+        state.error = "";
+        render();
+        return;
+      }
+      if (action === "person-back") {
+        state.pendingExit = true;
+        render();
+        return;
+      }
+      if (action === "add-person") { beginNewPerson(); return; }
+      if (action === "edit-person") { openEditPerson(Number(button.dataset.index)); return; }
+      if (action === "search") { state.view = "results"; render(); return; }
+      if (action === "back-to-group") { state.view = "group"; render(); return; }
+    });
+    app.addEventListener("submit", event => {
+      if (event.target.id === "custom-form") {
+        event.preventDefault();
+        const input = document.getElementById("custom-name");
+        const value = (input?.value || "").trim();
+        state.customValue = value;
+        if (!value) { state.customError = "Enter a name for this need."; render(); document.getElementById("custom-name")?.focus(); return; }
+        addNeed(value);
+      }
+    });
+    app.addEventListener("input", event => {
+      if (event.target.id === "person-name" && state.draft) state.draft.name = event.target.value;
+      if (event.target.id === "custom-name") state.customValue = event.target.value;
+    });
+    render();
+  </script>
+</body>
+</html>
