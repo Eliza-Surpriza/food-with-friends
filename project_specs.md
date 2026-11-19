@@ -21,20 +21,20 @@ Food with Friends is a mobile-forward web app that helps a group choose restaura
 - Each person's details screen lets the organizer add dietary needs. Choosing **Custom** opens text entry for a custom need.
 - Add one need at a time: selecting a specific option adds that need at the default severity and returns to the person's details screen. The organizer can use **+** again to add another.
 - A person may have no dietary needs. The organizer can enter a nickname and save immediately without adding a need; an empty needs list is valid.
-- New needs use the default severity, **“I won't eat this.”** The organizer can change severity from the person's details screen by tapping that need's severity indicator. The picker explains all four severity levels.
+- New needs use the default restriction level, **Avoid** (“I won't eat this”). The organizer can change the level from the person's details screen by tapping that need's triangle and short label. The picker explains all four levels.
 - A checkmark saves the person's details and returns to the group screen.
-- The group screen shows each person's name plus a summary of their dietary needs and severity indicators. It lets the organizer add another friend using the same nickname-and-needs flow. Tapping a person's name opens their details so the organizer can review or edit them.
-- Show a color marker for each need in the group summary: green for “I'd rather not have it,” yellow for “I won't eat this” (default), orange for “I can't eat anything that touches this,” and red for “I can't be in a room with this.” Provide an accessible severity label as well, so meaning does not rely on color alone.
+- The group screen shows each person's name plus a summary of their dietary needs, triangles, and short restriction-level labels. It lets the organizer add another friend using the same nickname-and-needs flow. Tapping a person's name opens their details so the organizer can review or edit them.
+- Show the short label beside each need's triangle in both person details and the group summary. Use green for **Preference**, yellow for **Avoid** (default), orange for **No contact**, and red for **Room-level**. Provide accessible text so meaning does not rely on color alone.
 - On a person's details screen, each dietary need has its own **X**; tapping it asks for confirmation and names the specific need, for example, “Remove peanuts?”
 - Tapping a person's **X** asks for confirmation and names the person, for example: “Are you sure you want to remove [nickname]?”
 - The search icon on the group screen opens restaurant results.
 
-Use this severity scale for each restriction:
+Use these restriction levels for each need:
 
-1. **I'd rather not have it** — The person might be open to suggestions that include it as an ingredient.
-2. **I won't eat this** — Default severity.
-3. **I can't eat anything that touches this** — Cross-contamination is a concern.
-4. **I can't be in a room with this** — Most severe; potentially life-threatening.
+1. **Preference** — “I'd rather not have it.” The person might be open to suggestions that include it as an ingredient.
+2. **Avoid** — “I won't eat this.” Default level.
+3. **No contact** — “I can't eat anything that touches this.” Cross-contamination is a concern.
+4. **Room-level** — “I can't be in a room with this.” Most severe; potentially life-threatening.
 
 ## Restaurant search and recommendations
 
@@ -46,6 +46,7 @@ Use this severity scale for each restriction:
 - Selecting a restaurant opens its detail page. Show each person's meal ideas in a horizontally scrollable row; the page itself can scroll vertically for more information.
 - Keep an **Edit group** control available on the results, restaurant, and meal pages so the organizer can revise the group at any point during browsing.
 - Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification. In the description, clearly state whether the item is a full meal, a side dish (and that it is not a full meal), or unclear based on the menu.
+- When an ingredient list is inferred from a menu description, incomplete, or not confirmed as an official item ingredient list, show a brief caveat directly below it in smaller, muted text.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
 - Show each restaurant's city and the most specific price information available, such as an entrée price range when listed.
@@ -84,3 +85,4 @@ Use this severity scale for each restriction:
 | 2026-11-18 15:02 America/Denver | Added evidence-linked AI menu recommendations, modification suggestions, meal-versus-side labels, and server-side hosting requirements. |
 | 2026-11-18 15:10 America/Denver | Set full-meal priority with clearly labeled side fallbacks and deferred user meal-preference controls. |
 | 2026-11-18 18:28 America/Denver | Kept names local while sending opaque participant IDs and restrictions; added search-error copy and meal-role detail descriptions. |
+| 2026-11-18 19:32 America/Denver | Added short restriction-level labels beside severity triangles and in the group summary. |

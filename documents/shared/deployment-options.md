@@ -1,10 +1,10 @@
 # Deployment and Search Architecture Options
 
-**Decision status:** Open. No option has been selected.
+**Decision status:** Selected: Option B, GitHub Pages + Supabase Edge Function.
 
 **Context:** Next.js + Supabase is the selected app/data stack. The team prefers GitHub Pages because it is free, and wants to compare deployment approaches before deciding. Visitors should only need a browser. The proposed group-search API contract is in [`search-api-contract.md`](search-api-contract.md).
 
-The current work board assumes AI will select and rank recommendations at search time through a protected server-side interface. Option C below would move matching into the browser and remove runtime AI, so it changes that current direction and requires an explicit product decision.
+The team agreed to the backend plan: a static Next.js export on GitHub Pages, Supabase Postgres for the reviewed catalog, and a Supabase Edge Function for protected search-time AI. Option C remains here as a comparison only; it is not the selected direction.
 
 ## Options at a glance
 
@@ -90,13 +90,11 @@ Keep the same JSON request and response. Replace the relative `/api/search` endp
 
 Replace the HTTP endpoint contract with a typed function contract, such as `matchGroup(people, catalog) -> full | partial | none`. Keep the same result data fields where practical so the UI can remain similar.
 
-## Questions to decide together
+## Remaining setup questions
 
-1. Is GitHub Pages itself a requirement, or is the real requirement a $0 public deployment?
-2. Should search logic stay server-side, or is browser-side matching acceptable for the first release?
-3. Does the first release need a live Supabase database, or can a reviewed static catalog meet the data needs?
-4. Will menu data be prepared and reviewed before publication, or must the public app process new menus at runtime?
-5. Which option fits the class-project/non-commercial use case and free-tier terms?
+- Confirm the repository's GitHub Pages base path and final published origin.
+- Configure local and published origins for the Edge Function's CORS policy.
+- Recheck free-tier limits and terms before launch.
 
 ## Sources checked 2026-11-18
 

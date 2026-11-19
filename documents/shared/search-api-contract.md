@@ -71,6 +71,7 @@ The response has an `outcome` of `full`, `partial`, or `none`.
                   "modification": null,
                   "description": "...",
                   "ingredients": [],
+                  "ingredientNote": null,
                   "imageUrl": null,
                   "sources": [],
                   "citations": [],
@@ -99,7 +100,8 @@ The response has an `outcome` of `full`, `partial`, or `none`.
 - Each meal includes `servingRole`: `full_meal`, `side`, `snack`, `drink`, or `unknown`, plus `servingRoleBasis`. State when it appears to be only a side or when the menu does not make the role clear; do not overstate portion size or completeness.
 - Prefer a suitable `full_meal` for each person. For a person at a restaurant with no suitable full-meal option, a suitable `side` may be returned as a fallback and must be clearly labeled. Do not describe a side as a full meal.
 - `recommendationReason` briefly explains why the AI selected the item and what evidence or uncertainty matters. Do not call an item safe or allergen-free.
-- Each meal includes `description`, `ingredients`, optional `imageUrl`, and meal-level `sources` and `warnings`.
+- Each meal includes `description`, `ingredients`, `ingredientNote`, optional `imageUrl`, and meal-level `sources` and `warnings`. Set `ingredientNote` when the ingredient list is inferred from a menu description, incomplete, or otherwise not confirmed as an official item ingredient list; use `null` when no such caveat applies.
+- When present, display `ingredientNote` directly below the ingredient list in smaller, muted text. Use clear wording such as “This isn't an official ingredients list; it was assembled from the menu description.” Do not describe inferred ingredients as a complete official list.
 - When a meal is opened, the detail view clearly describes its `servingRole` using `servingRoleBasis`: for example, state that it is a side dish and not a full meal, identify a full meal as listed, or say the menu does not make its role clear.
 - A source record should include its URL, source type (including menu or allergen guide), last-checked date, and confidence. Keep restaurant-level and meal-level provenance distinct. Where a recommendation depends on an ingredient, allergen, preparation, modification, or serving-role fact, include the supporting evidence in `citations` or a catalog evidence ID the frontend can resolve.
 - Each citation should resolve to a catalog source ID and include the direct URL, source label/type, last-checked date, and supporting excerpt or source location when available. If no allergen guide exists, make that absence explicit instead of implying that a guide was checked.
@@ -135,3 +137,4 @@ The response has an `outcome` of `full`, `partial`, or `none`.
 | 2026-11-18 15:03 America/Denver | Clarified that AI performs selection/ranking and validation enforces citations and hard constraints. |
 | 2026-11-18 15:10 America/Denver | Added full-meal priority with a labeled side fallback and deferred meal-preference input. |
 | 2026-11-18 18:28 America/Denver | Moved the contract to the Supabase Edge Function URL, kept participant names local, and specified error and meal-role detail copy. |
+| 2026-11-18 19:37 America/Denver | Added an ingredient-list caveat field and display requirement for inferred or incomplete ingredient lists. |
