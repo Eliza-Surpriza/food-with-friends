@@ -62,7 +62,7 @@ function SourceLinks({ sources }: { sources: RestaurantResult["sources"] }) {
       {sources.map((source) => (
         <li key={source.id}>
           <a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>
-          <span className="source-meta">Checked {source.lastCheckedOn} · {source.confidence}</span>
+          <span className="source-meta">Checked {source.lastCheckedOn}</span>
         </li>
       ))}
     </ul>

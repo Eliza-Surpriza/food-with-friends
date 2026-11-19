@@ -25,7 +25,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Create a Utah Valley restaurant/source inventory, preferring official public menus and allergen statements.
 - [ ] Define a repeatable maintainer process to retrieve menu content and ask AI to propose menu items, ingredient/allergen facts, possible modifications, and fact-level evidence.
 - [ ] Require a maintainer to verify AI candidates against their sources before publishing; preserve unsupported or missing facts as unknown.
-- [ ] Decide how source excerpts, source/check dates, confidence, reviewer, and catalog revisions are represented.
+- [ ] Decide how source excerpts, source/check dates, review status, reviewer, and catalog revisions are represented; do not assign source confidence levels.
 - [ ] Create a small representative catalog sample and use it to refine the data contract with Eliza.
 
 ### 3. Build the published catalog and validation
@@ -43,7 +43,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Let AI suggest specific modifications and label each suggestion as a full meal, side, or unclear based on menu evidence.
 - [ ] Require menu/allergen-guide citations from catalog source IDs for key claims; reject unsupported citations and preserve unknowns.
 - [ ] Rank full group coverage first, then partial groups by people covered; preserve strong room-level warnings and cross-contact uncertainty.
-- [ ] Return source links, evidence, confidence, last-checked dates, prices, city, serving role, ingredient disclosure status, ingredient evidence IDs, and warnings for frontend display.
+- [ ] Return source links, evidence, last-checked dates, prices, city, serving role, ingredient disclosure status, ingredient evidence IDs, and warnings for frontend display; let users assess the evidence without a confidence level.
 - [ ] Handle invalid requests/catalog data, unknown restrictions, no matches, AI timeout/provider errors, malformed output, and invalid citations.
 
 ### 5. Verify and maintain the catalog/search feature
@@ -103,7 +103,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
 - [ ] Open a separate meal detail page when a meal idea is selected; show the restaurant-sourced name, description, ingredients with disclosure status and evidence, price, whether it is a full meal or side (and state that a side is not a full meal), the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
 - [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
-- [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
+- [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, review status, supporting excerpts, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
 - [ ] Show a strong warning for room-level restrictions while allowing the user to decide whether to consider that restaurant.
 - [ ] Tell users to confirm uncertain ingredients and preparation practices with the restaurant; never label a dish as guaranteed allergen-free.
@@ -143,7 +143,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 - [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
 - [ ] **Mary + Eliza:** Define the search request: opaque per-search person IDs, restriction types or custom needs, and severity levels; keep unique nicknames in the frontend and map response IDs back to them.
-- [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, ingredient disclosure and evidence IDs, menu/allergen-guide citations, last-checked dates, confidence, and warnings.
+- [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, ingredient disclosure and evidence IDs, menu/allergen-guide citations, last-checked dates, review status, and warnings. Do not include confidence levels.
 - [ ] **Mary - Backend:** Provide the agreed search interface using reviewed catalog data, including full matches, partial matches, and no-match results.
 - [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
 - [ ] **Eliza - Frontend:** Build the API connection and replace the wireframe's sample result data with backend responses.
@@ -163,6 +163,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 | Date and time | Change |
 | --- | --- |
+| 2026-11-18 20:22 America/Denver | Removed source confidence from frontend data, validation, and display; updated backend task wording to rely on source evidence and review details. |
 | 2026-11-18 14:48 America/Denver | Replaced v1 upload/report ingestion tasks with AI-assisted catalog preparation and deterministic group search. |
 | 2026-11-18 15:02 America/Denver | Added server-side AI selection, modification, meal-role, and source-citation tasks. |
 | 2026-11-18 15:03 America/Denver | Clarified that AI owns menu selection and ranking; deterministic checks validate citations and hard constraints. |

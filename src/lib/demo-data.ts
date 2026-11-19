@@ -7,7 +7,6 @@ const sources: Source[] = fixture.sources.map((source) => ({
   label: source.type === "official_menu" ? "Official menu" : "Nutrition & allergen information",
   type: source.type,
   lastCheckedOn: source.lastCheckedOn,
-  confidence: source.confidence,
 }));
 
 export const sampleRestaurant: RestaurantResult = {

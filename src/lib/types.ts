@@ -45,7 +45,6 @@ export type Source = {
   label: string;
   type: string;
   lastCheckedOn: string;
-  confidence: string;
 };
 
 export type Citation = Source & {

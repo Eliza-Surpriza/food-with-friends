@@ -87,8 +87,7 @@ function isSource(value: unknown): boolean {
     && isHttpsUrl(source.url)
     && typeof source.label === "string"
     && typeof source.type === "string"
-    && typeof source.lastCheckedOn === "string"
-    && typeof source.confidence === "string";
+    && typeof source.lastCheckedOn === "string";
 }
 
 function isMeal(value: unknown): boolean {
