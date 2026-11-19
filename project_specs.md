@@ -48,11 +48,12 @@ Use these restriction levels for each need:
 - Selecting a meal idea opens a separate meal detail page with its exact restaurant-sourced name, description, ingredients, price, sources, and warnings. Do not append the serving role, category, or configuration to the name or title; put those details in separate fields and the description. Show an image when available and omit the image area otherwise. Identify who the meal is for and whether it works as listed or needs a modification. The description states whether the item is a full meal, a side (and that it is not a full meal), or unclear based on the menu.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
-- Show each restaurant's city and the most specific price information available, such as an entrée price range when listed.
+- Represent each restaurant chain as one catalog entry with known local locations/cities beneath it. Show the cities where known locations exist; do not imply every menu item is available at every location. Show the most specific price information available and its location scope when known.
 - When useful menu information is uncertain or incomplete, include the restaurant with a clear warning and rank it below restaurants with stronger evidence of suitable dishes.
 - For a room-level restriction, show the restaurant with a strong warning so the user can decide whether to consider it; do not automatically hide it.
 - When information is uncertain, tell the user to check with the restaurant before relying on the recommendation.
 - Use an AI recommendation service to select and rank menu items from the reviewed catalog for the current group's restrictions. Preserve the restaurant-sourced menu name exactly in the API response and frontend title; do not append labels such as “Full Meal,” “Side,” or “configurable menu item.” Put serving role and configuration details in the description or their separate fields. AI may suggest a clearly stated modification, such as asking for a salad without croutons, and should say whether the item appears to be a full meal, a side, or unclear.
+- Treat a menu item as the named offering shown on the restaurant's menu. If the restaurant says it is customizable, state that in its description with supporting evidence; keep the item name unchanged.
 - Prioritize a suitable full meal for each person. If a restaurant has no suitable full-meal option for a person, offer a suitable side as a fallback and label it clearly as a side. Group coverage remains the highest restaurant-ranking priority.
 - AI recommendations must use catalog facts, not invented menu knowledge. For each key ingredient, allergen, modification, or meal-role statement, show a direct link to the supporting menu or allergen guide when available. Do not fabricate citations.
 - Identify how ingredient information was obtained: definitive ingredient list for the exact item/configuration, ingredients mentioned in menu text (which may be incomplete), reviewed sources that do not state ingredients, or unknown when evidence is missing, insufficient, conflicting, or unreviewed. Display the disclosure status below the ingredient list in smaller, muted text and link the supporting evidence. Do not claim that a source is silent unless a reviewed source was checked.
@@ -66,7 +67,8 @@ Use these restriction levels for each need:
 
 - Use real restaurant and menu data where feasible.
 - Prefer official restaurant menus, websites, and statements. Third-party sources, such as delivery apps and restaurant listings, can help find candidate dishes but may be incomplete or out of date.
-- Make the source of each menu detail visible, with a source link, a last-checked date, and a confidence label.
+- Give users the information needed to judge each menu detail themselves: source link, publisher/source type, last-checked date, supporting excerpt and location, review status, and known uncertainty or conflict. Do not provide a confidence score or level.
+- For allergen facts, report source-backed information such as a stated allergen presence, or say that the information is unknown/unclear. Do not claim that an allergen is absent based on a blank marker, incomplete list, or source silence. Keep ingredient disclosure (including “not stated”) separate from allergen absence.
 - Show sources and warnings at both the restaurant level and the individual meal level.
 - Explain the evidence and uncertainty around ingredients and cross-contamination. A menu description alone may not establish whether a dish is safe, particularly for severe restrictions.
 - For displayed ingredients, distinguish a definitive ingredient list from menu-description mentions, reviewed source silence, and unknown or conflicting evidence. State the basis next to the ingredient information and do not treat a list of description mentions as complete.
@@ -90,3 +92,5 @@ Use these restriction levels for each need:
 | 2026-11-18 19:32 America/Denver | Added short restriction-level labels beside severity triangles and in the group summary. |
 | 2026-11-18 19:35 America/Denver | Required menu item titles to preserve the restaurant's name and keep serving-role labels in the description. |
 | 2026-11-18 19:45 America/Denver | Replaced the free-text ingredient caveat with the backend's evidence-backed disclosure categories. |
+| 2026-11-18 20:04 America/Denver | Removed confidence levels and required user-visible source, evidence, review, and uncertainty details for independent assessment. |
+| 2026-11-18 20:38 America/Denver | Added chain-level entries with known cities, customizable menu descriptions, and allergen reporting that preserves evidence without asserting allergen absence. |

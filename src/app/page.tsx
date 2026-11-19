@@ -37,6 +37,10 @@ function ingredientDisclosureText(disclosure: IngredientDisclosure): string {
 
 const newId = () => globalThis.crypto?.randomUUID?.() ?? `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+function formatRestaurantCities(cities: string[]): string {
+  return cities.length > 0 ? cities.join(", ") : "City not verified";
+}
+
 function SeverityMarker({ value }: { value: Severity }) {
   return (
     <svg className={`severity-marker marker-${value}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -63,7 +67,7 @@ function SourceLinks({ sources }: { sources: RestaurantResult["sources"] }) {
       {sources.map((source) => (
         <li key={source.id}>
           <a href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>
-          <span className="source-meta">Checked {source.lastCheckedOn} · {source.confidence}</span>
+          <span className="source-meta">Checked {source.lastCheckedOn}</span>
         </li>
       ))}
     </ul>
@@ -355,7 +359,7 @@ export default function Home() {
       <button className="back-link" onClick={() => setScreen("results")}><span aria-hidden="true">←</span> Back to results</button>
       {isSampleRestaurant && <div className="prototype-note"><strong>Sample menu only.</strong> No suitability has been determined for anyone in your group.</div>}
       <h1>{selectedRestaurant.name}</h1>
-      <p className="restaurant-meta">{selectedRestaurant.city ?? "City not verified"} · {selectedRestaurant.price ?? "Price not available"}</p>
+      <p className="restaurant-meta">{formatRestaurantCities(selectedRestaurant.cities)} · {selectedRestaurant.price ?? "Price not available"}</p>
       {isSampleRestaurant ? <section className="meal-section">
         <h2>Sample menu items</h2>
         <div className="meal-row" aria-label="Sample menu items">
@@ -445,7 +449,7 @@ export default function Home() {
 
 function RestaurantCard({ restaurant, onClick }: { restaurant: RestaurantResult; onClick: () => void }) {
   return <button className="restaurant-card" onClick={onClick}>
-    <span><span className="restaurant-title">{restaurant.name}</span><span className="restaurant-meta">{restaurant.city ?? "City not verified"} · {restaurant.price ?? "Price unavailable"}</span></span>
+    <span><span className="restaurant-title">{restaurant.name}</span><span className="restaurant-meta">{formatRestaurantCities(restaurant.cities)} · {restaurant.price ?? "Price unavailable"}</span></span>
     <span className="chevron" aria-hidden="true">›</span>
   </button>;
 }

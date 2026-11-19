@@ -67,7 +67,8 @@ function isRestaurantResult(value: unknown): boolean {
   const restaurant = value as Partial<SearchResponse["matches"][number]>;
   return typeof restaurant.id === "string"
     && typeof restaurant.name === "string"
-    && (typeof restaurant.city === "string" || restaurant.city === null)
+    && Array.isArray(restaurant.cities)
+    && restaurant.cities.every((city) => typeof city === "string")
     && (typeof restaurant.price === "string" || restaurant.price === null)
     && Array.isArray(restaurant.sources)
     && restaurant.sources.every(isSource)
@@ -87,8 +88,7 @@ function isSource(value: unknown): boolean {
     && isHttpsUrl(source.url)
     && typeof source.label === "string"
     && typeof source.type === "string"
-    && typeof source.lastCheckedOn === "string"
-    && typeof source.confidence === "string";
+    && typeof source.lastCheckedOn === "string";
 }
 
 function isMeal(value: unknown): boolean {
