@@ -17,14 +17,14 @@
       "type": "official_menu",
       "url": "https://www.costavida.com/menu/",
       "lastCheckedOn": "2026-11-18",
-      "confidence": "official corporate menu; location-specific availability not established"
+      "sourceNotes": "Official corporate menu; location-specific availability not established"
     },
     {
       "id": "costa-vida-nutrition-allergens",
       "type": "official_nutrition_allergen_information",
       "url": "https://www.costavida.com/nutrition-allergen-information/",
       "lastCheckedOn": "2026-11-18",
-      "confidence": "official corporate nutrition/allergen page; component/configuration details need review before item-level conclusions"
+      "sourceNotes": "Official corporate nutrition/allergen page; component/configuration details need review before item-level conclusions"
     }
   ],
   "menuItems": [

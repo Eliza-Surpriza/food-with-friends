@@ -14,7 +14,7 @@ Goals:
 
 - Create a useful Utah Valley restaurant catalog from public sources, preferring official restaurant information.
 - Use AI to speed up menu discovery and structuring without treating AI output as verified fact.
-- Keep each published fact traceable to its source, supporting evidence, review status, confidence, and last-checked date.
+- Keep each published fact traceable to its source, supporting evidence, review status, and last-checked date. Give users the underlying source, excerpt/location, and uncertainty details instead of a confidence score or level.
 - Let AI select and rank menu items for the full group's needs, showing suitable-as-listed, possible-with-modification, and uncertain options.
 - State whether each suggestion appears to be a full meal, a side, or unclear, with the basis and its source when available.
 - Never imply that a restaurant or dish is guaranteed allergen-free.
@@ -53,8 +53,8 @@ At minimum, represent:
 - **Source:** stable ID, restaurant ID, URL, source type (official or third-party), source title when available, last-checked date, and source status.
 - **Menu item:** stable ID, restaurant ID, exact item name as written by the restaurant, description, and available price/image information. Keep category, serving role, customization, and other descriptive qualifiers in separate fields; do not add them to the item's name.
 - **Ingredient disclosure:** whether a reviewed source provides a definitive ingredient list for the exact item/configuration, only mentions ingredients in a description, does not state ingredients, or leaves the basis unknown because evidence is insufficient or conflicting. Each ingredient fact records its evidence type and supporting evidence reference.
-- **Fact:** the ingredient, allergen, or preparation statement; whether it is restaurant-stated or maintainer interpretation; known/present/explicitly absent/unknown status as appropriate; confidence; and its own evidence reference.
-- **Evidence:** source ID and a short supporting text excerpt or location in the source. Keep evidence close to the fact it supports rather than only at the restaurant level.
+- **Fact:** the ingredient, allergen, or preparation statement; whether it is restaurant-stated or maintainer interpretation; known/present/explicitly absent/unknown status as appropriate; review status, completeness/uncertainty notes, and its own evidence reference. Do not return a confidence score or level to users.
+- **Evidence:** stable ID, source ID, a short verbatim source excerpt supporting the fact, and a source location when available. Keep evidence close to the fact it supports rather than only at the restaurant level; citations must preserve this excerpt and location.
 - **Modification:** a source-supported possible change, such as omitting an ingredient, with evidence and uncertainty retained.
 
 Unknown information must be distinct from an explicit restaurant statement that an ingredient or allergen is absent. Do not treat a menu description's ingredient mentions as a complete ingredient list. The interface must identify whether ingredients came from a definitive ingredient list or a menu description; when a reviewed source does not state ingredients, say so. Use unknown when source review or extraction is incomplete or conflicting rather than claiming no ingredients were stated. Ingredient absence does not establish lack of cross-contact. A menu description alone does not prove preparation practices. Custom restrictions that cannot be mapped to known catalog concepts remain uncertain and must not be treated as matched.
@@ -86,11 +86,11 @@ Unknown information must be distinct from an explicit restaurant statement that 
 
 ## States and edge cases
 
-Represent catalog facts as draft, reviewed, or published; distinguish source checks as successful, changed, unavailable, or failed. Handle duplicate restaurants/items, changed or unreachable pages, incomplete menus, conflicting sources, missing evidence, low-confidence extraction, unsupported custom restrictions, stale facts, and malformed catalog data. At search time also handle AI timeout or provider failure, invalid structured output, unknown source IDs, unsupported citations, contradictory evidence, and ambiguous meal-versus-side classification. Do not turn a processing failure or missing statement into an allergen absence. Preserve prior approved facts when a refresh fails; never return an uncited AI claim as a menu fact.
+Represent catalog facts as draft, reviewed, or published; distinguish source checks as successful, changed, unavailable, or failed. Handle duplicate restaurants/items, changed or unreachable pages, incomplete menus, conflicting sources, missing evidence, ambiguous or unsupported extraction, unsupported custom restrictions, stale facts, and malformed catalog data. At search time also handle AI timeout or provider failure, invalid structured output, unknown source IDs, unsupported citations, contradictory evidence, and ambiguous meal-versus-side classification. Do not turn a processing failure or missing statement into an allergen absence. Preserve prior approved facts when a refresh fails; never return an uncited AI claim as a menu fact.
 
 ## Risks and mitigation
 
-- **False confidence about allergy safety:** Preserve unknowns and conflicts, require evidence for every material recommendation claim, use severity-aware constraints, show warnings, and advise users to confirm with the restaurant. AI suggestions are not safety guarantees.
+- **False confidence about allergy safety:** Preserve unknowns and conflicts, require evidence for every material recommendation claim, show source details and uncertainty instead of a confidence score, use severity-aware constraints, show warnings, and advise users to confirm with the restaurant. AI suggestions are not safety guarantees.
 - **AI recommendation or extraction mistakes:** Require maintainer review of catalog facts, constrain recommendation input/output to catalog evidence, validate citations, and evaluate both extraction and recommendation quality before release.
 - **Unsafe or confusing modification advice:** Distinguish ordering an item without an ingredient from removing it after serving. For cross-contact concerns, do not imply ingredient removal resolves preparation risk.
 - **AI provider outage or bad output:** Define a clear search error/degraded state; never silently convert a model failure into a claim that no suitable dishes exist.
@@ -103,13 +103,13 @@ Represent catalog facts as draft, reviewed, or published; distinguish source che
 ## Acceptance criteria
 
 - Maintainers can create reviewed catalog entries for Utah Valley restaurants from public menu sources.
-- AI-assisted candidates include evidence references and confidence, and cannot be published until a maintainer verifies them.
+- AI-assisted candidates include evidence references, review state, and uncertainty notes, and cannot be published until a maintainer verifies them.
 - Search uses the published catalog and a server-side AI recommendation call; it does not fetch menu websites or use uncataloged web results at runtime.
 - Each recommendation includes a plain-language reason, an explicit as-listed/modification/uncertain status, a full-meal/side/unclear label, and links to the menu and allergen-guide sources that support its claims.
 - Each result's food name matches the restaurant's menu wording and is not decorated with serving-role or configuration labels. Serving role is stated in the description and separate response field.
 - The API returns the exact catalog name resolved from the selected item ID, plus a description that explicitly states full meal, side/not a full meal, or unclear from reviewed serving-role evidence.
 - AI cannot cite source IDs absent from the catalog; unsupported statements are omitted or marked unknown.
-- Each relevant menu fact exposes its source, last-checked date, evidence, confidence, and uncertainty to the result layer.
+- Each relevant menu fact exposes its source, last-checked date, supporting excerpt/location, review status, and uncertainty to the result layer; no confidence score or level is returned.
 - Ingredient displays identify whether they came from a definitive ingredient list or from ingredients mentioned in a menu description; a description-based list is labeled potentially incomplete. When reviewed sources do not state ingredients, the interface says so; insufficient or conflicting evidence remains unknown.
 - Unknown, explicit absence, and processing failure remain distinct; missing evidence never becomes a safety claim.
 - Recommendations respect severity, group coverage, uncertain ranking, and room-warning rules from `project_specs.md`; an ingredient omission alone does not resolve cross-contact concerns.
@@ -121,7 +121,7 @@ Represent catalog facts as draft, reviewed, or published; distinguish source che
 - `project_specs.md` defines Utah Valley coverage, group severity, group-coverage priority, result warnings, and restaurant-confirmation guidance.
 - The current work board records Next.js + Supabase as selected. Runtime AI requires a trusted server-side search endpoint. Confirm the deployment target and catalog storage with Eliza; a GitHub Pages-only site cannot protect provider credentials or host `/api/search`, so this runtime-AI decision supersedes the earlier static-only deployment assumption unless a separate secure backend is deployed.
 - Confirm the canonical source, fact, evidence, and modification schema before implementation.
-- Confirm the common restriction keys and how approved aliases map to catalog facts. Unmapped custom restrictions remain uncertain.
+- The API's common restriction keys are settled in [`../shared/search-api-contract.md`](../shared/search-api-contract.md). Define and review aliases that map those keys to catalog ingredient/allergen concepts before implementation; unmatched custom needs remain uncertain.
 - Confirm who can publish catalog changes and how reviews are recorded.
 - Source refresh is manual/as-needed for v1; automated cadence, crawling, and scheduled extraction are deferred.
 - User submissions and reports remain out of scope for v1. Runtime AI recommendations are now in scope and require a server-side model integration.
@@ -160,3 +160,6 @@ Track restaurant/menu coverage across Utah Valley; percentage of facts with evid
 | 2026-11-18 15:10 America/Denver | Prioritized full meals and defined clearly labeled side fallbacks; deferred user meal-preference control. |
 | 2026-11-18 19:20 America/Denver | Added ingredient disclosure provenance and distinct handling for complete lists, description mentions, unstated ingredients, and unknown evidence. |
 | 2026-11-18 19:39 America/Denver | Required restaurant-sourced names to resolve from catalog IDs and serving-role wording to be included in the backend description. |
+| 2026-11-18 19:52 America/Denver | Recorded the agreed restriction keys and kept catalog concept/alias mapping as a separate implementation decision. |
+| 2026-11-18 19:56 America/Denver | Required short verbatim source excerpts and locations on claim-linked evidence records. |
+| 2026-11-18 20:05 America/Denver | Replaced confidence scoring with source, review, evidence, and uncertainty details for users to assess. |

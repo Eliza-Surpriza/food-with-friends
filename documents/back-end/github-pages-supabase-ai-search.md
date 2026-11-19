@@ -63,6 +63,7 @@ The browser must not receive database service credentials or AI provider keys. A
 - Validate body size, participant count, restriction shape/severity, custom restriction length, and request content before using the database or AI provider. Exact limits remain a decision to settle before implementation.
 - Add request throttling/abuse controls and a monthly application-level AI usage guard. Because the endpoint is anonymous, define how requests are counted without retaining group data longer than needed.
 - Keep Supabase service-role credentials and AI-provider credentials in backend secrets only. Never put them in GitHub Pages build variables or committed files.
+- OpenAI API is the selected model provider. Create an OpenAI API project and application/service-account credential for the backend, then store the key as `OPENAI_API_KEY` in Supabase Function secrets. The key authenticates API calls; the function still needs an approved model, request/response handling, timeout and token limits, and the application-level budget guard. For local function development, keep the key in the ignored `supabase/functions/.env`; never commit it or expose it through browser configuration.
 - Return a safe structured error for invalid requests, throttling, exhausted AI budget, unavailable backend, provider failure, timeout, or malformed AI output. A failure must never be returned as `outcome: "none"`.
 - For a returned service error, network failure, timeout, or response-parsing failure, the frontend displays: **“There was an error. Please try again later.”** A successful `outcome: "none"` remains the separate no-matches state.
 
@@ -112,7 +113,7 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 
 ### Catalog and recommendations
 
-- Supabase stores reviewed restaurant, menu, source, allergen/ingredient, evidence, freshness, and confidence information. The exact schema remains to be agreed with the menu catalog plan and search contract.
+- Supabase stores reviewed restaurant, menu, source, allergen/ingredient, evidence, freshness, review-state, and uncertainty information. Do not return a confidence level to users; expose the source and evidence details they need to assess information themselves. The exact schema remains to be agreed with the menu catalog plan and search contract.
 - The AI selects and ranks menu items for the full group from relevant catalog facts. It may suggest evidence-supported modifications and labels each suggestion as a full meal, side, or unknown.
 - Prefer suitable full meals. A side may be used only as a fallback for a person with no suitable full meal at that restaurant and must be labeled as a side.
 - When a visitor opens a meal, its detail description must clearly state its serving role: full meal, side dish (including that it is not a full meal), or unclear based on the menu. Use the evidence basis for that description.
@@ -204,7 +205,7 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 - Decide development/staging origins and which origins may call the function.
 - Agree with the frontend owner on the deployed function URL configuration and public client settings.
 - Define the reviewed catalog schema and access policies with the menu catalog plan.
-- Select the AI provider/model, structured output method, timeout, and maximum per-request input/output budget.
+- OpenAI API is selected. Choose the exact model, structured-output method, timeout, and maximum per-request input/output budget.
 - Define request-size/participant limits, throttling policy, abuse controls, and the exact monthly usage accounting/reservation behavior under concurrent requests.
 - Define maintainer authentication, catalog write permissions, secret rotation, and incident ownership.
 - Agree on provider data retention, backend log redaction/retention, temporary group data handling, and search retry behavior.
@@ -257,3 +258,5 @@ Exact alert thresholds and who receives alerts are TBD. Logs should not include 
 | 2026-11-18 18:28 America/Denver | Specified local-only participant names, ID-keyed search results, generic error copy, and serving-role descriptions on meal details. |
 | 2026-11-18 19:20 America/Denver | Added validation and display requirements for ingredient-list versus description evidence and unstated/unknown ingredients. |
 | 2026-11-18 19:39 America/Denver | Required names to resolve from validated catalog IDs and backend descriptions to carry explicit serving-role wording. |
+| 2026-11-18 20:04 America/Denver | Removed confidence levels from user-facing data and required source/evidence details to support user judgment. |
+| 2026-11-18 20:07 America/Denver | Selected OpenAI API and documented API-key setup as a Supabase-only secret with additional model and budget configuration. |

@@ -66,7 +66,7 @@ Use this severity scale for each restriction:
 
 - Use real restaurant and menu data where feasible.
 - Prefer official restaurant menus, websites, and statements. Third-party sources, such as delivery apps and restaurant listings, can help find candidate dishes but may be incomplete or out of date.
-- Make the source of each menu detail visible, with a source link, a last-checked date, and a confidence label.
+- Give users the information needed to judge each menu detail themselves: source link, publisher/source type, last-checked date, supporting excerpt and location, review status, and known uncertainty or conflict. Do not provide a confidence score or level.
 - Show sources and warnings at both the restaurant level and the individual meal level.
 - Explain the evidence and uncertainty around ingredients and cross-contamination. A menu description alone may not establish whether a dish is safe, particularly for severe restrictions.
 - For displayed ingredients, distinguish a definitive ingredient list from ingredients mentioned in a menu description. State the basis next to the ingredient information, and say when a reviewed source does not state ingredients. Keep unverified or conflicting evidence labeled unknown; do not treat a list of description mentions as complete.
@@ -88,3 +88,4 @@ Use this severity scale for each restriction:
 | 2026-11-18 18:28 America/Denver | Kept names local while sending opaque participant IDs and restrictions; added search-error copy and meal-role detail descriptions. |
 | 2026-11-18 19:20 America/Denver | Required ingredient displays to identify whether they come from a definitive list, a menu description, or no stated/unknown information. |
 | 2026-11-18 19:35 America/Denver | Required menu item titles to preserve the restaurant's name and keep serving-role labels in the description. |
+| 2026-11-18 20:04 America/Denver | Removed confidence levels and required user-visible source, evidence, review, and uncertainty details for independent assessment. |
