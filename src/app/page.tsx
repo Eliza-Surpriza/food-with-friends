@@ -21,6 +21,7 @@ type Screen = "welcome" | "person" | "needs" | "severity" | "group" | "results" 
 type Removal = { kind: "need"; id: string } | { kind: "person"; id: string };
 type ResultMode = "best" | "partial" | "none";
 type SampleMenuItem = (typeof sampleMenuItems)[number];
+const logoSrc = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/food-with-friends-logo.png`;
 
 function ingredientDisclosureText(disclosure: IngredientDisclosure): string {
   switch (disclosure) {
@@ -211,7 +212,7 @@ export default function Home() {
   const header = (
     <header className="topbar">
       <button className="brand" type="button" onClick={() => setScreen("welcome")} aria-label="Food with Friends home">
-        <Image className="brand-logo" src="/food-with-friends-logo.png" alt="" width={40} height={40} />
+        <Image className="brand-logo" src={logoSrc} alt="" width={40} height={40} />
         <span>Food with Friends</span>
       </button>
       {["results", "restaurant", "meal"].includes(screen) && (
@@ -222,7 +223,7 @@ export default function Home() {
 
   let content: ReactNode;
   if (screen === "welcome") {
-    content = <section className="welcome"><div className="welcome-art" aria-hidden="true"><Image src="/food-with-friends-logo.png" alt="" width={124} height={120} priority /></div><h1>Welcome</h1><button className="button button-primary button-full" onClick={beginPerson}>Get started</button></section>;
+    content = <section className="welcome"><div className="welcome-art" aria-hidden="true"><Image src={logoSrc} alt="" width={124} height={120} priority /></div><h1>Welcome</h1><button className="button button-primary button-full" onClick={beginPerson}>Get started</button></section>;
   } else if (screen === "person" && draft) {
     content = <>
       {(editingPersonId !== null || people.length > 0) && <button className="back-link" onClick={() => setExitPrompt(true)}><span aria-hidden="true">←</span> Back</button>}
