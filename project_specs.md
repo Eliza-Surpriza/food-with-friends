@@ -9,6 +9,7 @@ Food with Friends is a mobile-forward web app that helps a group choose restaura
 - One organizer enters the dietary needs for the whole group.
 - The organizer must enter a name or nickname for each person. Results use it to identify who each suggested meal is for.
 - Names or nicknames must be unique within the group.
+- Keep names/nicknames in temporary frontend state only. For search, send an opaque per-search person ID and that person's restrictions; do not send the name to the backend or AI provider. Use response person IDs to map results to names held locally.
 - Each person can have multiple dietary needs. The app should offer common options and let the organizer add a custom restriction when needed.
 - Show specific restriction choices directly in the main list; do not require selecting a broad category and then expanding it.
 - Suggested common options include vegetarian, vegan, gluten-free, dairy-free, peanuts, tree nuts, shellfish, finfish, eggs, soy, sesame, and wheat. The list can be refined as needed.
@@ -44,7 +45,7 @@ Use this severity scale for each restriction:
 - If no restaurant works for anyone in the group, show a **No matches** state with an option to edit the group and search again.
 - Selecting a restaurant opens its detail page. Show each person's meal ideas in a horizontally scrollable row; the page itself can scroll vertically for more information.
 - Keep an **Edit group** control available on the results, restaurant, and meal pages so the organizer can revise the group at any point during browsing.
-- Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification.
+- Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification. In the description, clearly state whether the item is a full meal, a side dish (and that it is not a full meal), or unclear based on the menu.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
 - Show each restaurant's city and the most specific price information available, such as an entrée price range when listed.
@@ -58,6 +59,7 @@ Use this severity scale for each restriction:
 - For a known ingredient conflict, do not label the dish suitable as listed for a person who will not eat that ingredient. AI may offer an order-time modification as a separate suggestion, but must not describe removing an ingredient after serving as proof that the conflict is gone.
 - AI suggestions are not safety guarantees. If cross-contact matters, ingredient removal alone is not enough; preparation information must be available and users should still confirm details with the restaurant. Preserve uncertainty when evidence is missing or conflicting.
 - AI must run behind a server-side endpoint so provider credentials are not exposed in browser code. A static-only host requires a separate secure backend for this feature.
+- If the search service returns an error, times out, or cannot be reached, show: **“There was an error. Please try again later.”** Keep this error state separate from the successful **No matches** state.
 
 ## Menu information, sources, and trust
 
@@ -81,3 +83,4 @@ Use this severity scale for each restriction:
 | --- | --- |
 | 2026-11-18 15:02 America/Denver | Added evidence-linked AI menu recommendations, modification suggestions, meal-versus-side labels, and server-side hosting requirements. |
 | 2026-11-18 15:10 America/Denver | Set full-meal priority with clearly labeled side fallbacks and deferred user meal-preference controls. |
+| 2026-11-18 18:28 America/Denver | Kept names local while sending opaque participant IDs and restrictions; added search-error copy and meal-role detail descriptions. |

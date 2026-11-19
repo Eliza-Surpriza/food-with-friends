@@ -51,7 +51,7 @@ The browser must not receive database service credentials or AI provider keys. A
 ### Hosting and request path
 
 1. GitHub Actions builds the Next.js app in static-export mode and publishes the generated static files to GitHub Pages.
-2. The deployed browser sends the existing search request shape to the Supabase Edge Function URL, replacing the relative `POST /api/search` URL. The request and response semantics remain documented in [`search-api-contract.md`](../shared/search-api-contract.md).
+2. The deployed browser sends the search request to the Supabase Edge Function URL, replacing the relative `POST /api/search` URL. The JSON request includes only each person's opaque per-search ID and restrictions; names remain in temporary frontend state. The response refers to people by ID so the frontend can map results to local names. The request and response semantics are documented in [`search-api-contract.md`](../shared/search-api-contract.md).
 3. The function validates the request, loads only relevant reviewed catalog evidence, calls the AI provider using a server-side secret, validates the result, and returns recommendations.
 4. The response may cite only sources/evidence present in the reviewed catalog. Invalid or invented citations must be rejected or omitted with an appropriate uncertainty/error result.
 5. The function does not persist group restrictions or create user accounts. Logs and provider requests must avoid retaining unnecessary identifying or dietary information.
@@ -64,6 +64,7 @@ The browser must not receive database service credentials or AI provider keys. A
 - Add request throttling/abuse controls and a monthly application-level AI usage guard. Because the endpoint is anonymous, define how requests are counted without retaining group data longer than needed.
 - Keep Supabase service-role credentials and AI-provider credentials in backend secrets only. Never put them in GitHub Pages build variables or committed files.
 - Return a safe structured error for invalid requests, throttling, exhausted AI budget, unavailable backend, provider failure, timeout, or malformed AI output. A failure must never be returned as `outcome: "none"`.
+- For a returned service error, network failure, timeout, or response-parsing failure, the frontend displays: **“There was an error. Please try again later.”** A successful `outcome: "none"` remains the separate no-matches state.
 
 ### Security and privacy safeguards
 
@@ -92,7 +93,7 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 #### Allergy data, model behavior, and browser rendering
 
 - Treat restaurant web text and stored source excerpts as data, not instructions. Curators review sources before publication; the runtime search does not browse arbitrary URLs or follow instructions found inside menu content. Do not give the recommendation model tools or privileges that can modify the catalog or access unrelated systems.
-- Minimize model input: send only participant IDs, restriction labels/severity, and catalog facts needed to compare candidates. Do not send participant names, contact details, precise location, or other identifying information unless a future approved feature requires it. Do not persist group restrictions as profiles.
+- Keep names/nicknames in temporary frontend state and do not include them in the request to the function. Use opaque per-search IDs to associate restrictions with people and map response IDs back to local names. Minimize model input to those IDs, restriction labels/severity, and catalog facts needed to compare candidates. Do not send names, contact details, precise location, or other identifying information unless a future approved feature requires it. Do not persist group restrictions as profiles.
 - Do not log raw request bodies, participant names, full prompts, or full model responses by default. Prefer aggregate counts, response codes, latency, token/cost totals, and validation outcomes. Define any short-lived abuse metadata, provider retention, operational log retention, and deletion behavior before launch.
 - Require structured model output and validate it against the response schema and the catalog. Verify every cited source/evidence ID exists and belongs to the returned restaurant/menu item; validate that direct URLs are exactly the reviewed catalog URLs; reject unsupported ingredient, allergen, modification, preparation, price, and serving-role claims. Do not rely on prompt instructions alone for these constraints.
 - Apply deterministic post-validation for hard product rules: known ingredient conflicts cannot be called suitable as listed; unknown and conflicting facts remain uncertain; cross-contact severity cannot be satisfied by removing an ingredient alone; room-level warnings remain visible; and side fallback is used only when no suitable full meal is available for that person at that restaurant and is labeled as a side. AI selection does not make food safe or guarantee an outcome.
@@ -111,6 +112,7 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 - Supabase stores reviewed restaurant, menu, source, allergen/ingredient, evidence, freshness, and confidence information. The exact schema remains to be agreed with the menu catalog plan and search contract.
 - The AI selects and ranks menu items for the full group from relevant catalog facts. It may suggest evidence-supported modifications and labels each suggestion as a full meal, side, or unknown.
 - Prefer suitable full meals. A side may be used only as a fallback for a person with no suitable full meal at that restaurant and must be labeled as a side.
+- When a visitor opens a meal, its detail description must clearly state its serving role: full meal, side dish (including that it is not a full meal), or unclear based on the menu. Use the evidence basis for that description.
 - Preserve room-level warnings, cross-contact uncertainty, known conflicts, and the severity behavior defined in `project_specs.md`.
 - Missing or conflicting information remains unknown. Do not describe a restaurant or dish as guaranteed allergen-free.
 - Provide direct menu and allergen-guide links when those sources are present. Make the absence of a guide explicit when applicable.
@@ -125,8 +127,8 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 ## User flows
 
 1. **Visitor opens the site:** The browser downloads the static website from GitHub Pages. No install or sign-in is required.
-2. **Organizer searches:** The frontend sends the group's temporary restrictions to the configured Supabase function. The function validates input, retrieves catalog evidence, invokes AI, validates catalog-backed citations and product constraints, and returns results. The frontend presents loading, success, no-match, or error states distinctly.
-3. **Search cannot run:** A paused project, exhausted budget, request limit, network issue, provider error, or invalid model response returns a clear unavailable/error state. The organizer can retry later; the response is not represented as zero matches.
+2. **Organizer searches:** The frontend sends opaque per-search person IDs and restrictions, without names, to the configured Supabase function. The function validates input, retrieves catalog evidence, invokes AI, validates catalog-backed citations and product constraints, and returns results keyed by person ID. The frontend maps those IDs to locally held names and presents loading, success, no-match, or error states distinctly.
+3. **Search cannot run:** A paused project, exhausted budget, request limit, network issue, provider error, timeout, or invalid model response returns an error. The organizer sees **“There was an error. Please try again later.”**; the response is not represented as zero matches.
 4. **Maintainer updates catalog:** An authorized maintainer reviews source-backed records and publishes reviewed changes to Supabase. The public function reads the reviewed catalog; it does not scrape arbitrary restaurant pages during user search.
 5. **Team publishes a site update:** A reviewed code change triggers the static build and GitHub Pages deployment. The frontend's function URL and allowed origins must match the selected environments.
 
@@ -152,7 +154,7 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 | Malicious or misleading source text attempts prompt injection or induces fabricated menu advice | Review sources before publication, delimit excerpts as data, do not let source text authorize actions, grant no write/tools to the model, and validate output against evidence. |
 | AI invents menu facts, citations, modifications, or unsupported safety claims | Require structured output and catalog ID/URL validation; enforce hard allergy/product rules after AI selection; preserve unknowns and display evidence/warnings. |
 | Unsafe rendering of model/source text creates cross-site scripting or deceptive links | Render as escaped text; avoid raw HTML injection; permit only validated HTTPS catalog links and safe external-link behavior. |
-| Group restrictions or names are retained in browser storage, logs, or provider records | Minimize what is sent; do not persist group profiles; avoid raw payload logging; define browser clearing, provider retention, and log retention before launch. |
+| Group names or restrictions are persisted beyond the active search or retained in logs/provider records | Keep names in temporary frontend state, send only opaque IDs and restrictions, do not create group profiles, avoid raw payload logging, and define browser clearing, provider retention, and log retention before launch. |
 | Model/provider or catalog errors are mistaken for no matches or safe choices | Fail closed when required evidence/validation is unavailable; use separate error states; never convert a processing failure to `outcome: "none"`. |
 | Menu changes, conflicting facts, or a bad catalog edit lead to outdated recommendations | Store source links/check dates/review history, surface stale/conflicting facts, alert on suspicious changes, and preserve rollback to a prior reviewed version. |
 | GitHub Actions supply-chain compromise or unreviewed change publishes malicious code | Limit workflow permissions, protect the publish branch, review changes, avoid secrets in untrusted PR runs, and pin/review third-party actions and dependencies. |
@@ -172,6 +174,9 @@ Treat the GitHub Pages site, every browser request, the reviewed catalog content
 - Function responses cite only reviewed catalog source/evidence records and preserve the required allergy warnings, modification rules, group coverage, full-meal preference, and labeled side fallback.
 - Invalid requests, disallowed browser origins, throttling, provider failures, exhausted budget, and backend pause produce clear errors and never a false no-match result.
 - Group restrictions are not persisted as profiles; logging and provider retention follow the agreed minimization policy.
+- Search requests and AI prompts do not contain participant names; the frontend can still identify result owners by mapping response IDs to local names.
+- An opened meal's description clearly identifies a full meal, a side (and says it is not a full meal), or an unclear serving role.
+- Search API, network, timeout, and response-parsing errors show **“There was an error. Please try again later.”** and remain distinct from a successful no-matches result.
 - Maintainers can identify backend health, budget state, failed searches, and catalog freshness without treating processing failure as missing allergen information.
 
 ## Dependencies and decisions
@@ -242,3 +247,4 @@ Exact alert thresholds and who receives alerts are TBD. Logs should not include 
 | --- | --- |
 | 2026-11-18 15:55 America/Denver | Created the initial GitHub Pages and Supabase AI search deployment plan from the approved deployment proposal. |
 | 2026-11-18 16:19 America/Denver | Expanded security planning for the public endpoint, database permissions, secrets, AI inputs/outputs, privacy, CI/CD, abuse controls, and incident response. |
+| 2026-11-18 18:28 America/Denver | Specified local-only participant names, ID-keyed search results, generic error copy, and serving-role descriptions on meal details. |

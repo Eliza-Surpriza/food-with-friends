@@ -17,7 +17,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Confirm a server-side deployment for runtime AI and whether the reviewed catalog is stored as files or Supabase records; GitHub Pages alone cannot host the protected AI endpoint.
 - [ ] Agree with Eliza on restaurant, source, menu item, allergen/ingredient fact, evidence, and modification fields.
 - [ ] Confirm common restriction keys and how custom restrictions map to known catalog concepts; unmatched needs remain uncertain.
-- [ ] Agree on the group-search request/response and frontend loading/error states.
+- [ ] Agree on the group-search request/response using opaque per-search person IDs plus restrictions (nicknames stay in frontend state), and frontend loading/error states.
 - [ ] Choose a server-side AI provider/model for search-time recommendations and catalog preparation; define secret handling, cost/latency limits, and failure behavior.
 
 ### 2. Define the AI-assisted catalog workflow
@@ -69,7 +69,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Agree with Mary on the project structure, styling approach, and local development workflow.
 - [x] Create a low-fidelity clickable prototype of the mobile-first group setup and restaurant browsing flow in [`wireframe.html`](wireframe.html): group review, best and partial matches, no-match state, restaurant details, and meal details.
 - [ ] Start the flow at the first person's nickname-and-needs screen after Welcome; use a checkmark to return to the group screen and a search icon there to open restaurant results.
-- [ ] Agree with Mary on the AI search request/response data for participants, restrictions and severity, per-person suggestions, modifications, full-meal/side labels, evidence citations, warnings, restaurant city, and prices.
+- [ ] Agree with Mary on the AI search request/response data for opaque person IDs, restrictions and severity, per-person suggestions, modifications, full-meal/side labels, evidence citations, warnings, restaurant city, and prices; map response IDs to nicknames held locally.
 - [ ] Define catalog loading, invalid-data, incomplete-information, and search-error states; menu extraction is maintainer-side and does not create user-facing processing progress in v1.
 - [ ] Confirm temporary-search behavior, including what group data remains in browser state and when it is cleared.
 
@@ -101,7 +101,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] If there are no matches for anyone, show a no-matches state with an option to edit the group and search again.
 - [ ] Show each restaurant's city and the most specific price information available.
 - [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
-- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, whether it is a full meal or side, the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
+- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, price, whether it is a full meal or side (and state that a side is not a full meal), the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
 - [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
 - [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
@@ -110,7 +110,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 #### 5. Handle search and result states
 
-- [ ] Design catalog/search loading and error states; menu extraction is maintainer-side and is not part of the user's live search.
+- [ ] Design catalog/search loading and error states; show “There was an error. Please try again later.” for returned search errors, timeouts, network failures, and invalid responses; menu extraction is maintainer-side and is not part of the user's live search.
 - [ ] Design useful empty states for no restaurants, no suitable items for a person, and incomplete menu information.
 - [ ] Handle backend/network errors and stale or missing source details without presenting unknown information as safe.
 - [ ] Keep an **Edit group** control available on results, restaurant, and meal pages so the organizer can update needs and search again without rebuilding the group.
@@ -141,7 +141,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 ## First end-to-end integration
 
 - [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
-- [ ] **Mary + Eliza:** Define the search request: people, unique nicknames, restriction types or custom needs, and severity levels.
+- [ ] **Mary + Eliza:** Define the search request: opaque per-search person IDs, restriction types or custom needs, and severity levels; keep unique nicknames in the frontend and map response IDs back to them.
 - [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, menu/allergen-guide citations, last-checked dates, confidence, and warnings.
 - [ ] **Mary - Backend:** Provide the agreed search interface using reviewed catalog data, including full matches, partial matches, and no-match results.
 - [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
@@ -167,3 +167,4 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 | 2026-11-18 15:03 America/Denver | Clarified that AI owns menu selection and ranking; deterministic checks validate citations and hard constraints. |
 | 2026-11-18 15:21 America/Denver | Added deployment and search architecture options for joint review. |
 | 2026-11-18 15:10 America/Denver | Recorded full-meal-first recommendations, labeled side fallback, and future user preference control. |
+| 2026-11-18 18:28 America/Denver | Updated shared tasks for local-only nicknames, generic search error copy, and explicit side descriptions on meal details. |

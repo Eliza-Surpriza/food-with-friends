@@ -1,0 +1,120 @@
+{
+  "fixtureId": "costa-vida-source-backed-ui-sample",
+  "purpose": "Frontend and API-contract walkthrough only; this is not an approved production catalog record or an allergy-safe recommendation.",
+  "status": "source_review_needed",
+  "checkedOn": "2026-11-18",
+  "restaurant": {
+    "id": "costa-vida-sample",
+    "name": "Costa Vida",
+    "restaurantLocation": null,
+    "city": null,
+    "locationNote": "The supplied pages are corporate sources and do not identify a particular Utah County location. Add a location and verify its current menu before production use.",
+    "priceRange": null
+  },
+  "sources": [
+    {
+      "id": "costa-vida-menu",
+      "type": "official_menu",
+      "url": "https://www.costavida.com/menu/",
+      "lastCheckedOn": "2026-11-18",
+      "confidence": "official corporate menu; location-specific availability not established"
+    },
+    {
+      "id": "costa-vida-nutrition-allergens",
+      "type": "official_nutrition_allergen_information",
+      "url": "https://www.costavida.com/nutrition-allergen-information/",
+      "lastCheckedOn": "2026-11-18",
+      "confidence": "official corporate nutrition/allergen page; component/configuration details need review before item-level conclusions"
+    }
+  ],
+  "menuItems": [
+    {
+      "id": "costa-vida-burrito-example",
+      "name": "Burrito (configurable menu item)",
+      "category": "Entrees",
+      "description": "The corporate menu describes burritos as a customizable entrée with a tortilla, meat, cheese, rice, beans, and sauce; toppings and ingredients may be customized.",
+      "servingRole": "full_meal",
+      "servingRoleBasis": "The menu places Burritos in its Entrees category.",
+      "servingRoleSourceIds": ["costa-vida-menu"],
+      "price": null,
+      "ingredients": [
+        { "name": "tortilla", "status": "menu_component; exact selection varies" },
+        { "name": "meat", "status": "menu_component; protein varies" },
+        { "name": "cheese", "status": "listed menu component; exact preparation needs location/variant review" },
+        { "name": "rice", "status": "menu component" },
+        { "name": "beans", "status": "menu component; selection varies" },
+        { "name": "sauce", "status": "menu component; selection varies" }
+      ],
+      "possibleModificationForWalkthrough": {
+        "request": "Ask whether a listed ingredient or topping can be omitted.",
+        "basis": "The menu says ingredients and toppings can be customized.",
+        "warning": "This does not establish a safe preparation method or rule out cross-contact. Do not mark a modification suitable for a severe restriction without supporting preparation evidence.",
+        "sourceIds": ["costa-vida-menu"]
+      },
+      "allergenFacts": [],
+      "allergenStatus": "unknown_for_the_assembled_item; review the selected tortilla, protein, beans, sauces, toppings, and preparation separately",
+      "sourceIds": ["costa-vida-menu", "costa-vida-nutrition-allergens"]
+    },
+    {
+      "id": "costa-vida-tortilla-chips-example",
+      "name": "Chips",
+      "category": "Chips, Dips, & Sides",
+      "description": "The menu describes house-fried corn tortilla chips finished with salt and lime.",
+      "servingRole": "side",
+      "servingRoleBasis": "The menu places Chips under its Chips, Dips, & Sides category.",
+      "servingRoleSourceIds": ["costa-vida-menu"],
+      "price": null,
+      "ingredients": [
+        { "name": "corn tortilla", "status": "menu description" },
+        { "name": "salt", "status": "menu description" },
+        { "name": "lime", "status": "menu description" }
+      ],
+      "allergenFacts": [
+        {
+          "allergen": "soybeans",
+          "sourceObservation": "The nutrition/allergen table displays a soybeans marker for Tortilla Chips.",
+          "status": "source_marker_needs_maintainer_confirmation",
+          "sourceIds": ["costa-vida-nutrition-allergens"]
+        }
+      ],
+      "unmarkedAllergenColumns": "unknown; a blank or unmarked cell in the page extraction is not treated as evidence of absence",
+      "sourceIds": ["costa-vida-menu", "costa-vida-nutrition-allergens"]
+    }
+  ],
+  "componentAllergenObservations": [
+    {
+      "component": "Flour Tortilla",
+      "sourceObservations": [
+        "The nutrition/allergen table displays a Wheat Gluten marker for Flour Tortilla.",
+        "The page notes dairy may be included when the tortilla is crisped on the flat grill."
+      ],
+      "status": "source_observation; verify interpretation and preparation details before production use",
+      "sourceIds": ["costa-vida-nutrition-allergens"]
+    },
+    {
+      "component": "Wheat-gluten preparation warning",
+      "sourceObservation": "The restaurant describes gluten-friendly customization and says flour in the air can prevent a zero-contamination guarantee despite processes intended to reduce contact.",
+      "status": "restaurant_level_warning",
+      "sourceIds": ["costa-vida-nutrition-allergens"]
+    }
+  ],
+  "exampleRequest": {
+    "people": [
+      {
+        "id": "person-example-1",
+        "restrictions": [
+          { "type": "custom", "label": "wheat/gluten", "severity": 3 }
+        ]
+      }
+    ]
+  },
+  "walkthroughChecks": [
+    "Keep the person's nickname in frontend state; the request above contains only the opaque ID and restriction data.",
+    "Show Burrito as a full meal based on the menu category, without implying its configurable recipe is suitable for a restriction.",
+    "Show Chips as a side and state that it is not a full meal when it appears as a fallback.",
+    "Use the direct official menu and nutrition/allergen links on the detail view.",
+    "Show price and restaurant city as unavailable until a specific Utah County location and price source are verified.",
+    "Preserve unknown allergen facts and the flour-in-the-air warning; do not infer that an unmarked allergen column means absence.",
+    "Treat source-marker interpretation and exact item/location facts as pending maintainer review before production catalog use."
+  ]
+}
