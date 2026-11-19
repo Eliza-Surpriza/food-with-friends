@@ -148,7 +148,7 @@ function errorResponse(code: string, message: string, status: number): Response 
 }
 
 export default {
-  fetch: withSupabase({ auth: ["publishable"] }, async (req, ctx) => {
+  fetch: withSupabase({ auth: ["publishable", "secret"] }, async (req, ctx) => {
     if (req.method !== "POST") {
       return errorResponse("method_not_allowed", "Use POST for search requests.", 405);
     }
@@ -165,62 +165,16 @@ export default {
       return errorResponse(parsed.code, parsed.message, 400);
     }
 
-    const [
-      chainsResult,
-      locationsResult,
-      sourcesResult,
-      menuItemsResult,
-      itemLocationsResult,
-      evidenceResult,
-      factsResult,
-      factEvidenceResult,
-    ] = await Promise.all([
-      ctx.supabase
-        .from("restaurant_chains")
-        .select("id, name, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("restaurant_locations")
-        .select("id, chain_id, city, location_name, address, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("catalog_sources")
-        .select("id, chain_id, location_id, url, source_type, publisher, title, last_checked_on, source_status, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("menu_items")
-        .select("id, chain_id, name, description, category, serving_role, serving_role_basis, price, image_url, ingredient_disclosure, availability_note, review_status, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("menu_item_locations")
-        .select("menu_item_id, location_id, availability_status, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("catalog_evidence")
-        .select("id, source_id, excerpt, source_location, excerpt_unavailable, record_status")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("menu_facts")
-        .select("id, chain_id, menu_item_id, location_id, fact_type, subject, statement, claim_status, ingredient_evidence_type, attribution, review_status, record_status, uncertainty_notes")
-        .eq("record_status", "published"),
-      ctx.supabase
-        .from("menu_fact_evidence")
-        .select("fact_id, evidence_id"),
-    ]);
+    // Temporary local verification: confirm the function can read published
+    // catalog items. The final search response will be added in a later step.
+    const { data, error } = await ctx.supabase
+      .from("menu_items")
+      .select("id, name, description, category, serving_role")
+      .eq("record_status", "published")
+      .limit(10);
 
-    const failedQuery = [
-      { table: "restaurant_chains", error: chainsResult.error },
-      { table: "restaurant_locations", error: locationsResult.error },
-      { table: "catalog_sources", error: sourcesResult.error },
-      { table: "menu_items", error: menuItemsResult.error },
-      { table: "menu_item_locations", error: itemLocationsResult.error },
-      { table: "catalog_evidence", error: evidenceResult.error },
-      { table: "menu_facts", error: factsResult.error },
-      { table: "menu_fact_evidence", error: factEvidenceResult.error },
-    ].find((query) => query.error !== null);
-
-    if (failedQuery) {
-      console.error(`Published catalog read failed for ${failedQuery.table}:`, failedQuery.error);
+    if (error) {
+      console.error("Catalog read failed:", error);
       return errorResponse(
         "catalog_read_failed",
         "Search is temporarily unavailable. Please try again later.",
@@ -228,106 +182,10 @@ export default {
       );
     }
 
-    const chains = chainsResult.data ?? [];
-    const locations = locationsResult.data ?? [];
-    const sources = sourcesResult.data ?? [];
-    const menuItems = menuItemsResult.data ?? [];
-    const itemLocations = itemLocationsResult.data ?? [];
-    const evidence = evidenceResult.data ?? [];
-    const facts = factsResult.data ?? [];
-    const factEvidenceLinks = factEvidenceResult.data ?? [];
-
-    const chainIds = new Set(chains.map((chain) => chain.id));
-    const locationIds = new Set(locations.map((location) => location.id));
-    const itemIds = new Set(menuItems.map((item) => item.id));
-    const sourceById = new Map(sources.map((source) => [source.id, source]));
-    const evidenceById = new Map(
-      evidence
-        .filter((record) => sourceById.has(record.source_id))
-        .map((record) => [record.id, {
-          id: record.id,
-          excerpt: record.excerpt,
-          sourceLocation: record.source_location,
-          excerptUnavailable: record.excerpt_unavailable,
-          source: sourceById.get(record.source_id),
-        }]),
-    );
-
-    const evidenceIdsByFact = new Map<string, string[]>();
-    for (const link of factEvidenceLinks) {
-      if (!evidenceById.has(link.evidence_id)) continue;
-      const linkedIds = evidenceIdsByFact.get(link.fact_id) ?? [];
-      linkedIds.push(link.evidence_id);
-      evidenceIdsByFact.set(link.fact_id, linkedIds);
-    }
-
-    // Facts without a published evidence link, or facts tied to unpublished
-    // records, are not passed forward as support for a recommendation.
-    const evidenceBackedFacts = facts
-      .filter((fact) =>
-        chainIds.has(fact.chain_id) &&
-        (fact.menu_item_id === null || itemIds.has(fact.menu_item_id)) &&
-        (fact.location_id === null || locationIds.has(fact.location_id)) &&
-        (evidenceIdsByFact.get(fact.id)?.length ?? 0) > 0
-      )
-      .map((fact) => ({
-        ...fact,
-        evidence: (evidenceIdsByFact.get(fact.id) ?? [])
-          .map((id) => evidenceById.get(id))
-          .filter((record) => record !== undefined),
-      }));
-
-    const catalog = chains.map((chain) => {
-      const chainLocations = locations.filter((location) => location.chain_id === chain.id);
-      const chainItems = menuItems.filter((item) => item.chain_id === chain.id);
-      const chainSources = sources.filter((source) => source.chain_id === chain.id);
-      const chainFacts = evidenceBackedFacts.filter((fact) => fact.chain_id === chain.id);
-
-      return {
-        id: chain.id,
-        name: chain.name,
-        cities: [...new Set(chainLocations.map((location) => location.city))],
-        locations: chainLocations,
-        sources: chainSources,
-        facts: chainFacts.filter((fact) => fact.menu_item_id === null),
-        menuItems: chainItems
-          .map((item) => ({
-            ...item,
-            locations: itemLocations
-              .filter((entry) => entry.menu_item_id === item.id)
-              .map((entry) => ({
-                ...entry,
-                location: chainLocations.find((location) => location.id === entry.location_id) ?? null,
-              })),
-            facts: chainFacts.filter((fact) => fact.menu_item_id === item.id),
-          }))
-          // An item without published evidence-backed facts cannot support an
-          // allergy recommendation, so keep it out of the model's future input.
-          .filter((item) => item.facts.length > 0),
-      };
-    }).filter((chain) => chain.menuItems.length > 0 || chain.facts.length > 0);
-
-    const publishedItemCount = catalog.reduce((total, chain) => total + chain.menuItems.length, 0);
-    if (publishedItemCount === 0) {
-      return errorResponse(
-        "catalog_not_ready",
-        "Search is temporarily unavailable. Please try again later.",
-        503,
-      );
-    }
-
-    // Temporary development summary. The full API response and AI selection
-    // are the next implementation stage; do not report an empty catalog as
-    // outcome "none".
     return Response.json({
       requestValid: true,
       catalogConnected: true,
-      peopleReceived: parsed.value.people.length,
-      catalogSummary: {
-        restaurantCount: catalog.length,
-        menuItemCount: publishedItemCount,
-        evidenceBackedFactCount: evidenceBackedFacts.length,
-      },
+      items: data ?? [],
     });
   }),
 };
