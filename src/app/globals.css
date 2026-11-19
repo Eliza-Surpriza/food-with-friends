@@ -25,7 +25,7 @@ a { color: var(--green); }
 .device { width: min(100%, 480px); min-height: min(880px, calc(100svh - 40px)); display: flex; flex-direction: column; overflow: hidden; background: var(--paper); border: 1px solid #e5e8e4; border-radius: 28px; box-shadow: 0 18px 55px #25312b12; }
 .topbar { min-height: 66px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; border-bottom: 1px solid #edf0ec; }
 .brand { display: inline-flex; align-items: center; gap: 9px; padding: 0; border: 0; color: var(--ink); background: transparent; font-weight: 750; letter-spacing: -.03em; }
-.brand-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; color: white; background: var(--green); font-size: 15px; }
+.brand-logo { width: 34px; height: 34px; object-fit: contain; }
 .header-action { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: white; font-size: 13px; font-weight: 700; }
 .header-action:hover { background: #f7f8f5; }
 main { display: flex; flex: 1; flex-direction: column; padding: 24px 22px 20px; }
@@ -71,7 +71,8 @@ input::placeholder { color: #909a94; }
 .button-danger { color: white; background: var(--red); }
 .button-danger:hover { background: #85241f; }
 .welcome { display: flex; min-height: 620px; flex-direction: column; justify-content: center; padding: 10px 0 36px; }
-.welcome-art { width: 108px; height: 108px; display: grid; place-items: center; margin-bottom: 25px; border-radius: 34px; color: #255b40; background: var(--green-soft); font-size: 46px; transform: rotate(-5deg); }
+.welcome-art { width: 138px; height: 138px; display: grid; place-items: center; margin-bottom: 25px; border-radius: 34px; background: var(--green-soft); }
+.welcome-art img { width: 124px; height: 120px; object-fit: contain; }
 .welcome .button { margin-top: 24px; }
 .option-list { display: grid; gap: 9px; margin: 20px 0; }
 .option { width: 100%; min-height: 49px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: white; text-align: left; font-weight: 650; }

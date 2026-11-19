@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import Image from "next/image";
 import { sampleMenuItems, sampleRestaurant } from "@/lib/demo-data";
 import { createSearchRequest, searchRestaurants } from "@/lib/search-client";
 import {
@@ -206,7 +207,8 @@ export default function Home() {
   const header = (
     <header className="topbar">
       <button className="brand" type="button" onClick={() => setScreen("welcome")} aria-label="Food with Friends home">
-        <span className="brand-mark" aria-hidden="true">f</span><span>Food with Friends</span>
+        <Image className="brand-logo" src="/food-with-friends-logo.png" alt="" width={40} height={40} />
+        <span>Food with Friends</span>
       </button>
       {["results", "restaurant", "meal"].includes(screen) && (
         <button className="header-action" type="button" onClick={() => setScreen("group")}>Edit group</button>
@@ -216,7 +218,7 @@ export default function Home() {
 
   let content: ReactNode;
   if (screen === "welcome") {
-    content = <section className="welcome"><div className="welcome-art" aria-hidden="true">⌂</div><h1>Welcome</h1><button className="button button-primary button-full" onClick={beginPerson}>Get started</button></section>;
+    content = <section className="welcome"><div className="welcome-art" aria-hidden="true"><Image src="/food-with-friends-logo.png" alt="" width={124} height={120} priority /></div><h1>Welcome</h1><button className="button button-primary button-full" onClick={beginPerson}>Get started</button></section>;
   } else if (screen === "person" && draft) {
     content = <>
       {(editingPersonId !== null || people.length > 0) && <button className="back-link" onClick={() => setExitPrompt(true)}><span aria-hidden="true">←</span> Back</button>}
