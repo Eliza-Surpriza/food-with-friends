@@ -91,7 +91,7 @@ export type RestaurantPersonSuggestions = {
 export type RestaurantResult = {
   id: string;
   name: string;
-  city: string | null;
+  cities: string[];
   price: string | null;
   sources: Source[];
   warnings: string[];

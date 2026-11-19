@@ -12,7 +12,7 @@ const sources: Source[] = fixture.sources.map((source) => ({
 export const sampleRestaurant: RestaurantResult = {
   id: fixture.restaurant.id,
   name: fixture.restaurant.name,
-  city: fixture.restaurant.city,
+  cities: fixture.restaurant.cities,
   price: fixture.restaurant.priceRange,
   sources,
   warnings: [

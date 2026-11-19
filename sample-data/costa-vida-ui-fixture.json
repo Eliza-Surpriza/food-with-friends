@@ -7,7 +7,7 @@
     "id": "costa-vida-sample",
     "name": "Costa Vida",
     "restaurantLocation": null,
-    "city": null,
+    "cities": [],
     "locationNote": "The supplied pages are corporate sources and do not identify a particular Utah County location. Add a location and verify its current menu before production use.",
     "priceRange": null
   },
