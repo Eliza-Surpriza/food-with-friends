@@ -8,6 +8,7 @@ import {
   SEVERITIES,
   severityInfo,
   type MealSuggestion,
+  type IngredientDisclosure,
   type Person,
   type RestrictionType,
   type RestaurantResult,
@@ -19,6 +20,19 @@ type Screen = "welcome" | "person" | "needs" | "severity" | "group" | "results" 
 type Removal = { kind: "need"; id: string } | { kind: "person"; id: string };
 type ResultMode = "best" | "partial" | "none";
 type SampleMenuItem = (typeof sampleMenuItems)[number];
+
+function ingredientDisclosureText(disclosure: IngredientDisclosure): string {
+  switch (disclosure) {
+    case "complete_ingredient_list":
+      return "These ingredients are from the source's definitive ingredient list for this item or configuration.";
+    case "description_only":
+      return "These ingredients are mentioned in the menu description; the list may be incomplete.";
+    case "not_stated":
+      return "The reviewed source does not state the ingredients.";
+    case "unknown":
+      return "Ingredient information is unknown from the available evidence.";
+  }
+}
 
 const newId = () => globalThis.crypto?.randomUUID?.() ?? `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
@@ -367,13 +381,8 @@ export default function Home() {
     const meal = selectedMeal;
     const isSampleMeal = "sourceIds" in meal;
     const ingredients = isSampleMeal
-      ? meal.ingredients.map((item) => `${item.name} — ${item.status}`)
-      : meal.ingredients;
-    const roleText = meal.servingRole === "side"
-      ? "Side dish; this is not a full meal."
-      : meal.servingRole === "full_meal"
-        ? "Listed as a full meal."
-        : "The menu does not establish whether this is a full meal.";
+      ? meal.ingredients.map((item) => `${item.name}${"status" in item && item.status ? ` — ${item.status}` : ""}`)
+      : meal.ingredients.map((item) => item.name);
     const mealSources = isSampleMeal
       ? selectedRestaurant.sources.filter((source) => meal.sourceIds.includes(source.id))
       : meal.sources;
@@ -387,23 +396,22 @@ export default function Home() {
       : meal.warnings;
     const personEntry = isSampleMeal ? undefined : selectedRestaurant.people.find((entry) => entry.meals.some((item) => item.id === meal.id));
     const personName = personEntry ? personByRequestId[personEntry.personId]?.name : undefined;
-    const ingredientNote = isSampleMeal
-      ? "This isn't an official ingredients list; it was assembled from the menu description. Ingredients and components can vary by location or customization."
-      : meal.ingredientNote;
+    const ingredientDisclosure: IngredientDisclosure = meal.ingredientDisclosure as IngredientDisclosure;
     content = <>
       <button className="back-link" onClick={() => setScreen("restaurant")}><span aria-hidden="true">←</span> Back to {selectedRestaurant.name}</button>
       {isSampleMeal && <div className="prototype-note"><strong>Sample item only.</strong> It has not been assessed against your group's needs.</div>}
       <h1>{meal.name}</h1>
       <p className="meal-detail-person">{selectedRestaurant.name}{personName ? ` · for ${personName}` : ""}</p>
       {!isSampleMeal && meal.imageUrl && <img className="meal-image" src={meal.imageUrl} alt={meal.name} />}
-      <section className="detail-section"><h2>Description</h2><p>{meal.description}</p><p className="detail-value">{roleText} {meal.servingRoleBasis}</p></section>
+      <section className="detail-section"><h2>Description</h2><p>{meal.description}</p></section>
       {!isSampleMeal && <section className="detail-section"><h2>Match details</h2>
         <p>{meal.matchStatus === "as_listed" ? "Suggested as listed" : meal.matchStatus === "modification" ? "May work with a modification" : "Uncertain — check with the restaurant"}</p>
         {meal.modification && <p><strong>Ask the restaurant:</strong> {meal.modification}</p>}
         <p>{meal.recommendationReason}</p>
       </section>}
-      <section className="detail-section"><h2>Ingredients</h2><ul>{ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}</ul>
-        {ingredientNote && <p className="ingredient-note">{ingredientNote}</p>}
+      <section className="detail-section"><h2>Ingredients</h2>
+        {ingredients.length > 0 ? <ul>{ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}</ul> : <p className="muted">No ingredient details listed.</p>}
+        <p className="ingredient-note">{ingredientDisclosureText(ingredientDisclosure)}</p>
       </section>
       <section className="detail-section"><h2>Price</h2><p>{meal.price ?? "Not listed"}</p></section>
       <section className="detail-section"><h2>Sources</h2><SourceLinks sources={mealSources} />

@@ -106,9 +106,9 @@ function isMeal(value: unknown): boolean {
     && typeof meal.recommendationReason === "string"
     && (typeof meal.modification === "string" || meal.modification === null)
     && typeof meal.description === "string"
+    && ["complete_ingredient_list", "description_only", "not_stated", "unknown"].includes(String(meal.ingredientDisclosure))
     && Array.isArray(meal.ingredients)
-    && meal.ingredients.every((ingredient) => typeof ingredient === "string")
-    && (typeof meal.ingredientNote === "string" || meal.ingredientNote === null)
+    && meal.ingredients.every(isIngredient)
     && (meal.imageUrl === null || isHttpsUrl(meal.imageUrl))
     && Array.isArray(meal.sources)
     && meal.sources.every(isSource)
@@ -117,6 +117,15 @@ function isMeal(value: unknown): boolean {
       && (!("excerpt" in citation) || typeof citation.excerpt === "string"))
     && Array.isArray(meal.warnings)
     && meal.warnings.every((warning) => typeof warning === "string");
+}
+
+function isIngredient(value: unknown): boolean {
+  if (!value || typeof value !== "object") return false;
+  const ingredient = value as Record<string, unknown>;
+  return typeof ingredient.name === "string"
+    && ["ingredient_list", "menu_description", "other_source", "unknown"].includes(String(ingredient.evidenceType))
+    && Array.isArray(ingredient.evidenceIds)
+    && ingredient.evidenceIds.every((id) => typeof id === "string");
 }
 
 function isHttpsUrl(value: unknown): value is string {

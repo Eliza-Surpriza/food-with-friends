@@ -52,6 +52,20 @@ export type Citation = Source & {
   excerpt?: string;
 };
 
+export type IngredientDisclosure =
+  | "complete_ingredient_list"
+  | "description_only"
+  | "not_stated"
+  | "unknown";
+
+export type IngredientEvidenceType = "ingredient_list" | "menu_description" | "other_source" | "unknown";
+
+export type Ingredient = {
+  name: string;
+  evidenceType: IngredientEvidenceType;
+  evidenceIds: string[];
+};
+
 export type MealSuggestion = {
   id: string;
   name: string;
@@ -62,8 +76,8 @@ export type MealSuggestion = {
   recommendationReason: string;
   modification: string | null;
   description: string;
-  ingredients: string[];
-  ingredientNote: string | null;
+  ingredientDisclosure: IngredientDisclosure;
+  ingredients: Ingredient[];
   imageUrl: string | null;
   sources: Source[];
   citations: Citation[];

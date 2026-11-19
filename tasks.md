@@ -43,7 +43,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] Let AI suggest specific modifications and label each suggestion as a full meal, side, or unclear based on menu evidence.
 - [ ] Require menu/allergen-guide citations from catalog source IDs for key claims; reject unsupported citations and preserve unknowns.
 - [ ] Rank full group coverage first, then partial groups by people covered; preserve strong room-level warnings and cross-contact uncertainty.
-- [ ] Return source links, evidence, confidence, last-checked dates, prices, city, serving role, ingredient-list caveats, and warnings for frontend display.
+- [ ] Return source links, evidence, confidence, last-checked dates, prices, city, serving role, ingredient disclosure status, ingredient evidence IDs, and warnings for frontend display.
 - [ ] Handle invalid requests/catalog data, unknown restrictions, no matches, AI timeout/provider errors, malformed output, and invalid citations.
 
 ### 5. Verify and maintain the catalog/search feature
@@ -101,7 +101,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 - [ ] If there are no matches for anyone, show a no-matches state with an option to edit the group and search again.
 - [ ] Show each restaurant's city and the most specific price information available.
 - [ ] On a restaurant page, show each person's meal ideas in a horizontally scrollable row and allow vertical scrolling for more restaurant information.
-- [ ] Open a separate meal detail page when a meal idea is selected; show the meal name, description, ingredients, any ingredient-list uncertainty note, price, whether it is a full meal or side (and state that a side is not a full meal), the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
+- [ ] Open a separate meal detail page when a meal idea is selected; show the restaurant-sourced name, description, ingredients with disclosure status and evidence, price, whether it is a full meal or side (and state that a side is not a full meal), the AI's reason, direct menu/allergen-guide links, warnings, the person it is for, and whether it works as listed or needs a modification. Show the image area only when an image is available.
 - [ ] For each restaurant, show suitable menu items by person and distinguish items suitable as listed from items that may work with a stated modification.
 - [ ] Show source information and warnings at both restaurant level and meal level, including source links, last-checked dates, confidence labels, and relevant ingredient or cross-contamination details.
 - [ ] Keep uncertain results visible with clear warnings and place them below results with stronger supporting information.
@@ -143,7 +143,7 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 
 - [ ] **Mary + Eliza:** Choose the frontend and backend stacks and agree on how to run both locally.
 - [ ] **Mary + Eliza:** Define the search request: opaque per-search person IDs, restriction types or custom needs, and severity levels; keep unique nicknames in the frontend and map response IDs back to them.
-- [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, ingredient-list caveats, menu/allergen-guide citations, last-checked dates, confidence, and warnings.
+- [ ] **Mary + Eliza:** Define the AI search response: ranked restaurants, partial-match groups, city, prices, per-person meal ideas, modification status, full-meal/side labels, reasons, ingredient disclosure and evidence IDs, menu/allergen-guide citations, last-checked dates, confidence, and warnings.
 - [ ] **Mary - Backend:** Provide the agreed search interface using reviewed catalog data, including full matches, partial matches, and no-match results.
 - [ ] **Mary - Backend:** Apply the agreed severity and group-coverage rules; preserve unknowns and evidence rather than treating missing information as safe.
 - [ ] **Eliza - Frontend:** Build the API connection and replace the wireframe's sample result data with backend responses.
@@ -172,3 +172,4 @@ Status: `[ ]` not started / `[~]` in progress / `[x]` done
 | 2026-11-18 19:15 America/Denver | Recorded the selected GitHub Pages + Supabase Edge Function deployment and started the TypeScript frontend implementation. |
 | 2026-11-18 19:32 America/Denver | Added short restriction-level labels beside severity triangles in the app, wireframe, and product spec. |
 | 2026-11-18 19:37 America/Denver | Added an ingredient-list uncertainty note to meal details and the proposed search response. |
+| 2026-11-18 19:45 America/Denver | Aligned ingredient detail display and tasks with Mary's ingredient disclosure statuses and evidence-linked ingredient objects. |

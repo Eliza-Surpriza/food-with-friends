@@ -45,8 +45,7 @@ Use these restriction levels for each need:
 - If no restaurant works for anyone in the group, show a **No matches** state with an option to edit the group and search again.
 - Selecting a restaurant opens its detail page. Show each person's meal ideas in a horizontally scrollable row; the page itself can scroll vertically for more information.
 - Keep an **Edit group** control available on the results, restaurant, and meal pages so the organizer can revise the group at any point during browsing.
-- Selecting a meal idea opens a separate meal detail page with its name, description, ingredients, price, sources, and warnings. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification. In the description, clearly state whether the item is a full meal, a side dish (and that it is not a full meal), or unclear based on the menu.
-- When an ingredient list is inferred from a menu description, incomplete, or not confirmed as an official item ingredient list, show a brief caveat directly below it in smaller, muted text.
+- Selecting a meal idea opens a separate meal detail page with its restaurant-sourced name, description, ingredients, price, sources, and warnings. Keep the title exactly as the restaurant names the item; serving role and configuration details belong in the description or their separate fields. Show an image when one is available; omit the image area when none is available. Identify the person it is for and whether it works as listed or needs a modification. The description states whether the item is a full meal, a side (and that it is not a full meal), or unclear based on the menu.
 - Show specific menu items for specific people, including the person's name or nickname.
 - Show items that appear suitable as listed separately from items that may work with a modification. Clearly state the suggested modification, such as omitting cheese.
 - Show each restaurant's city and the most specific price information available, such as an entrée price range when listed.
@@ -56,6 +55,7 @@ Use these restriction levels for each need:
 - Use an AI recommendation service to select and rank menu items from the reviewed catalog for the current group's restrictions. AI may suggest a clearly stated modification, such as asking for a salad without croutons, and should say whether the item appears to be a full meal, a side, or unclear.
 - Prioritize a suitable full meal for each person. If a restaurant has no suitable full-meal option for a person, offer a suitable side as a fallback and label it clearly as a side. Group coverage remains the highest restaurant-ranking priority.
 - AI recommendations must use catalog facts, not invented menu knowledge. For each key ingredient, allergen, modification, or meal-role statement, show a direct link to the supporting menu or allergen guide when available. Do not fabricate citations.
+- Identify the basis for ingredient information: definitive list, ingredients mentioned in a menu description (which may be incomplete), reviewed sources that do not state ingredients, or unknown when evidence is missing or conflicting. Display this status below the ingredient list in smaller, muted text and keep evidence linked.
 - If no allergen guide or supporting source is available, say so and show the source that is available; do not imply that the missing guide confirmed anything.
 - For a known ingredient conflict, do not label the dish suitable as listed for a person who will not eat that ingredient. AI may offer an order-time modification as a separate suggestion, but must not describe removing an ingredient after serving as proof that the conflict is gone.
 - AI suggestions are not safety guarantees. If cross-contact matters, ingredient removal alone is not enough; preparation information must be available and users should still confirm details with the restaurant. Preserve uncertainty when evidence is missing or conflicting.
@@ -69,6 +69,7 @@ Use these restriction levels for each need:
 - Make the source of each menu detail visible, with a source link, a last-checked date, and a confidence label.
 - Show sources and warnings at both the restaurant level and the individual meal level.
 - Explain the evidence and uncertainty around ingredients and cross-contamination. A menu description alone may not establish whether a dish is safe, particularly for severe restrictions.
+- For displayed ingredients, distinguish a definitive ingredient list from menu-description mentions, reviewed source silence, and unknown or conflicting evidence. Do not treat a list of description mentions as complete.
 - Clearly advise users to confirm uncertain ingredients, preparation practices, and cross-contamination concerns directly with the restaurant.
 
 ## Later features
@@ -86,3 +87,4 @@ Use these restriction levels for each need:
 | 2026-11-18 15:10 America/Denver | Set full-meal priority with clearly labeled side fallbacks and deferred user meal-preference controls. |
 | 2026-11-18 18:28 America/Denver | Kept names local while sending opaque participant IDs and restrictions; added search-error copy and meal-role detail descriptions. |
 | 2026-11-18 19:32 America/Denver | Added short restriction-level labels beside severity triangles and in the group summary. |
+| 2026-11-18 19:45 America/Denver | Replaced the free-text ingredient caveat with the backend's evidence-backed disclosure categories. |

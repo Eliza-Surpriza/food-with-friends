@@ -62,16 +62,18 @@ The response has an `outcome` of `full`, `partial`, or `none`.
               "meals": [
                 {
                   "id": "m1",
-                  "name": "Meal name",
+                  "name": "Burrito",
                   "price": "$14",
                   "matchStatus": "as_listed",
-                  "servingRole": "side",
-                  "servingRoleBasis": "The menu lists this under sides.",
+                  "servingRole": "full_meal",
+                  "servingRoleBasis": "The menu lists Burritos under Entrees.",
                   "recommendationReason": "...",
                   "modification": null,
-                  "description": "...",
-                  "ingredients": [],
-                  "ingredientNote": null,
+                  "description": "Full meal: The menu lists Burritos under Entrees.",
+                  "ingredientDisclosure": "description_only",
+                  "ingredients": [
+                    { "name": "...", "evidenceType": "menu_description", "evidenceIds": ["ev1"] }
+                  ],
                   "imageUrl": null,
                   "sources": [],
                   "citations": [],
@@ -94,19 +96,22 @@ The response has an `outcome` of `full`, `partial`, or `none`.
 - `outcome: "none"`: neither full nor partial matches exist; both arrays are empty.
 - Return restaurants in ranking order. Order partial groups by participant count, largest first. A restaurant may appear in more than one partial group.
 - Each restaurant includes its `city`, best available `price` string (or `null` if unknown), restaurant-level `sources` and `warnings`, plus meal options grouped by `personId`.
-- The AI recommendation service selects and ranks meals from the published catalog for each person. The AI may suggest a menu-backed modification, but cannot invent dishes, ingredients, restaurant policies, or sources.
+- The AI recommendation service selects and ranks meals from the published catalog for each person. Each meal's `id` identifies a reviewed catalog item; the backend resolves its exact restaurant-sourced `name` after validating that ID. Do not append a serving role, category, or configuration qualifier to the name or title. Keep those details in their own fields and the description. The AI may suggest a menu-backed modification, but cannot invent dishes, ingredients, restaurant policies, or sources.
 - The service sends the full group's opaque IDs and restriction data to the AI so it can prioritize shared restaurant coverage. It does not send participant names. Deterministic post-validation checks schema, catalog source IDs, known conflicts, and required warnings; it does not choose or rank the meals.
 - Each meal's `matchStatus` is `as_listed`, `modification`, or `uncertain`. Include the suggested `modification` when relevant, phrased as a request to the restaurant where appropriate (for example, ask for a salad without croutons).
 - Each meal includes `servingRole`: `full_meal`, `side`, `snack`, `drink`, or `unknown`, plus `servingRoleBasis`. State when it appears to be only a side or when the menu does not make the role clear; do not overstate portion size or completeness.
+- The backend response `description` includes plain-language serving-role wording from `servingRole` and `servingRoleBasis`: identify a full meal, state that a side is not a full meal, or say the role is unclear. The frontend displays that description as returned.
 - Prefer a suitable `full_meal` for each person. For a person at a restaurant with no suitable full-meal option, a suitable `side` may be returned as a fallback and must be clearly labeled. Do not describe a side as a full meal.
 - `recommendationReason` briefly explains why the AI selected the item and what evidence or uncertainty matters. Do not call an item safe or allergen-free.
-- Each meal includes `description`, `ingredients`, `ingredientNote`, optional `imageUrl`, and meal-level `sources` and `warnings`. Set `ingredientNote` when the ingredient list is inferred from a menu description, incomplete, or otherwise not confirmed as an official item ingredient list; use `null` when no such caveat applies.
-- When present, display `ingredientNote` directly below the ingredient list in smaller, muted text. Use clear wording such as “This isn't an official ingredients list; it was assembled from the menu description.” Do not describe inferred ingredients as a complete official list.
+- Each meal includes `description`, `ingredientDisclosure`, `ingredients`, optional `imageUrl`, and meal-level `sources` and `warnings`.
+- `ingredientDisclosure` is `complete_ingredient_list`, `description_only`, `not_stated`, or `unknown`. Use `complete_ingredient_list` only for a definitive ingredient list for the exact item/configuration. Use `description_only` when ingredients are mentioned in menu text but may not be complete. Use `not_stated` only when a maintainer-reviewed source was checked and does not state the ingredients. Use `unknown` for missing, insufficient, conflicting, or unreviewed evidence; do not imply that this means the source was silent.
+- Each ingredient is an object with `name`, `evidenceType` (`ingredient_list`, `menu_description`, `other_source`, or `unknown`), and `evidenceIds` linking to reviewed evidence. Cite evidence for both the disclosure status and each ingredient claim. Do not infer a complete list from a menu description or a subset of known ingredients.
+- The frontend derives small, muted copy directly below the ingredient list from `ingredientDisclosure`: definitive source list; menu description mentions, possibly incomplete; reviewed source does not state ingredients; or ingredient information unknown from available evidence. Do not use model-generated wording for this label.
 - When a meal is opened, the detail view clearly describes its `servingRole` using `servingRoleBasis`: for example, state that it is a side dish and not a full meal, identify a full meal as listed, or say the menu does not make its role clear.
 - A source record should include its URL, source type (including menu or allergen guide), last-checked date, and confidence. Keep restaurant-level and meal-level provenance distinct. Where a recommendation depends on an ingredient, allergen, preparation, modification, or serving-role fact, include the supporting evidence in `citations` or a catalog evidence ID the frontend can resolve.
 - Each citation should resolve to a catalog source ID and include the direct URL, source label/type, last-checked date, and supporting excerpt or source location when available. If no allergen guide exists, make that absence explicit instead of implying that a guide was checked.
 - Citations must come from the reviewed catalog and link directly to the relevant menu and allergen guide when available. The service must reject or omit an AI citation whose source ID is not in the catalog; it must not fabricate URLs or evidence.
-- Missing ingredient or cross-contamination information remains unknown; it must not be presented as evidence that a meal is safe.
+- Missing ingredient or cross-contamination information remains unknown; it must not be presented as evidence that a meal is safe. Verified source silence is distinct from missing or unreviewed evidence.
 - AI suggestions must follow the severity meanings in `project_specs.md`. For cross-contact concerns, merely removing an ingredient is insufficient without supporting restaurant preparation evidence. A room-level restriction retains a strong restaurant warning and is not automatically hidden.
 - The frontend uses `outcome` to show best matches, partial matches, or the no-matches screen with an **Edit group** action.
 
@@ -125,6 +130,7 @@ The response has an `outcome` of `full`, `partial`, or `none`.
 - Confirm the exact supported `type` keys for common restrictions and custom entries.
 - The deployment target is GitHub Pages for the static Next.js export and a Supabase Edge Function for this POST request. Confirm the final project URL and CORS origins before deployment. Runtime AI must not run in a public browser.
 - Confirm the precise source, ingredient/allergen fact, and evidence shapes before implementation.
+- Confirm and implement ingredient disclosure statuses and ingredient-level evidence IDs in the catalog and API response.
 - Choose the AI provider/model and agree on timeout, cost limits, private handling of temporary group restrictions, and whether model failures return an error or an approved fallback.
 - Future contract extension: add an optional meal preference (full meals only vs. allow sides as fallbacks) after deciding whether the preference applies per person or to the whole group. Until then, use the default full-meal-first behavior.
 
@@ -138,3 +144,4 @@ The response has an `outcome` of `full`, `partial`, or `none`.
 | 2026-11-18 15:10 America/Denver | Added full-meal priority with a labeled side fallback and deferred meal-preference input. |
 | 2026-11-18 18:28 America/Denver | Moved the contract to the Supabase Edge Function URL, kept participant names local, and specified error and meal-role detail copy. |
 | 2026-11-18 19:37 America/Denver | Added an ingredient-list caveat field and display requirement for inferred or incomplete ingredient lists. |
+| 2026-11-18 19:45 America/Denver | Replaced free-text ingredient notes with evidence-backed disclosure statuses and ingredient evidence fields to match the updated backend plan. |
