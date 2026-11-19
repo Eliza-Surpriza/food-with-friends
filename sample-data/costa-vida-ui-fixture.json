@@ -30,20 +30,21 @@
   "menuItems": [
     {
       "id": "costa-vida-burrito-example",
-      "name": "Burrito (configurable menu item)",
+      "name": "Burrito",
       "category": "Entrees",
       "description": "The corporate menu describes burritos as a customizable entrée with a tortilla, meat, cheese, rice, beans, and sauce; toppings and ingredients may be customized.",
       "servingRole": "full_meal",
       "servingRoleBasis": "The menu places Burritos in its Entrees category.",
       "servingRoleSourceIds": ["costa-vida-menu"],
       "price": null,
+      "ingredientDisclosure": "description_only",
       "ingredients": [
-        { "name": "tortilla", "status": "menu_component; exact selection varies" },
-        { "name": "meat", "status": "menu_component; protein varies" },
-        { "name": "cheese", "status": "listed menu component; exact preparation needs location/variant review" },
-        { "name": "rice", "status": "menu component" },
-        { "name": "beans", "status": "menu component; selection varies" },
-        { "name": "sauce", "status": "menu component; selection varies" }
+        { "name": "tortilla", "status": "selection varies", "evidenceType": "menu_description" },
+        { "name": "meat", "status": "protein varies", "evidenceType": "menu_description" },
+        { "name": "cheese", "status": "exact preparation/location needs review", "evidenceType": "menu_description" },
+        { "name": "rice", "evidenceType": "menu_description" },
+        { "name": "beans", "status": "selection varies", "evidenceType": "menu_description" },
+        { "name": "sauce", "status": "selection varies", "evidenceType": "menu_description" }
       ],
       "possibleModificationForWalkthrough": {
         "request": "Ask whether a listed ingredient or topping can be omitted.",
@@ -64,10 +65,11 @@
       "servingRoleBasis": "The menu places Chips under its Chips, Dips, & Sides category.",
       "servingRoleSourceIds": ["costa-vida-menu"],
       "price": null,
+      "ingredientDisclosure": "description_only",
       "ingredients": [
-        { "name": "corn tortilla", "status": "menu description" },
-        { "name": "salt", "status": "menu description" },
-        { "name": "lime", "status": "menu description" }
+        { "name": "corn tortilla", "evidenceType": "menu_description" },
+        { "name": "salt", "evidenceType": "menu_description" },
+        { "name": "lime", "evidenceType": "menu_description" }
       ],
       "allergenFacts": [
         {
